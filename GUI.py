@@ -1,6 +1,6 @@
 import main
 import tkinter as tk
-from tkinter import ttk
+
 
 class GameApp(tk.Tk):
     def __init__(self):
@@ -12,10 +12,11 @@ class GameApp(tk.Tk):
         self.game = Game(self)
         self.game.pack()
 
+
 class Game(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
-        self.master:GameApp = master
+        self.master: GameApp = master
         self.squares = [tk.Button(self, text=main.puzzle[i], height=2, width=5,
                                   command=lambda val=i: self.button_clicked(val)) for i in range(81)]
         self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=master.val)
@@ -26,27 +27,32 @@ class Game(tk.Frame):
         self.place_widgets()
 
     def button_clicked(self, val):
-        self.master.row.set(val//9+1)
-        self.master.col.set(val%9+1)
+        self.master.row.set(val // 9 + 1)
+        self.master.col.set(val % 9 + 1)
         self.place_widgets()
 
     def change_val(self):
-        if main.do_move(str(self.master.val.get()), self.master.row.get()-1, self.master.col.get()-1) == "Valid":
+        if main.do_move(str(self.master.val.get()), self.master.row.get() - 1, self.master.col.get() - 1) == "Valid":
             if self.master.val.get() != 0:
-                self.squares[(self.master.row.get()-1)*9+(self.master.col.get()-1)] = tk.Button(self, text=str(self.master.val.get()), height=2, width=5)
+                self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)] = tk.Button(self, text=str(
+                    self.master.val.get()), height=2, width=5)
             else:
-                self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)] = tk.Button(self, text="", height=2, width=5)
+                self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)] = tk.Button(self, text="",
+                                                                                                        height=2,
+                                                                                                        width=5)
             self.error_message.config(text="")
         else:
-            self.error_message.config(text=main.do_move(str(self.master.val.get()), self.master.row.get()-1, self.master.col.get()-1))
+            self.error_message.config(
+                text=main.do_move(str(self.master.val.get()), self.master.row.get() - 1, self.master.col.get() - 1))
         self.place_widgets()
+
     def place_widgets(self):
         for i in range(81):
-            self.squares[i].grid(row=i//9+i//27, column=i%9+i%9//3, padx=5, pady=5)
-        tk.Label(self, text="_"*100).grid(row=3, column=0, columnspan=11)
-        tk.Label(self, text="_"*100).grid(row=7, column=0, columnspan=11)
-        tk.Label(self, text="|\n"*35).grid(row=0, column=3, rowspan=11)
-        tk.Label(self, text="|\n"*35).grid(row=0, column=7, rowspan=11)
+            self.squares[i].grid(row=i // 9 + i // 27, column=i % 9 + i % 9 // 3, padx=5, pady=5)
+        tk.Label(self, text="_" * 100).grid(row=3, column=0, columnspan=11)
+        tk.Label(self, text="_" * 100).grid(row=7, column=0, columnspan=11)
+        tk.Label(self, text="|\n" * 35).grid(row=0, column=3, rowspan=11)
+        tk.Label(self, text="|\n" * 35).grid(row=0, column=7, rowspan=11)
         tk.Label(self, text="Value:").grid(row=0, column=12)
         tk.Label(self, text="Column").grid(row=1, column=12)
         tk.Label(self, text="Row").grid(row=2, column=12)
@@ -55,6 +61,7 @@ class Game(tk.Frame):
         self.col_input.grid(row=2, column=13)
         self.submit_button.grid(row=3, column=13)
         self.error_message.grid(row=4, column=12, columnspan=2, rowspan=3)
+
 
 if __name__ == "__main__":
     app = GameApp()

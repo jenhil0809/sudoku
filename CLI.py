@@ -12,4 +12,3 @@ while True:
         print(txt.format(*[square.val for square in main.rows[i].vals]))
         if i == 2 or i == 5:
             print("-"*30)
-
