@@ -48,27 +48,21 @@ class Square:
 rows = [Group() for i in range(9)]
 cols = [Group() for i in range(9)]
 boxes = [Group() for i in range(9)]
-puzzle = " 7 583 2  592  3  34   65 7795   632   36971  68   27  914835 76 3 7 1495567429 13"
+puzzle = " 7 583 2  592  3  34   65 7795   632  36971  68   27  914835 76 3 7 1495567429 13"
 for row in range(9):
     for col in range(9):
         Square(puzzle[col+row*9], row, col, rows, cols, boxes)
 
-txt = "{:^3}{:^3}{:^3}|{:^3}{:^3}{:^3}|{:^3}{:^3}{:^3}"
-while True:
-    row = int(input("row"))
-    col = int(input("col"))
-    val = input("val")
+
+def do_move(val, row, col):
     square = rows[row].vals[col]
     prev = square.val
     square.val = val
     if not (square.row.check_valid() and square.col.check_valid() and square.box.check_valid()):
         square.val = prev
-        print("Invalid: number may only appear once a row, column or 3x3 box")
+        return "Invalid: number may only appear once a row, column or 3x3 box"
     elif puzzle[col+row*9] != " ":
         square.val = prev
-        print("Invalid: box is a clue")
-    for i in range(9):
-        print(txt.format(*[square.val for square in rows[i].vals]))
-        if i == 2 or i == 5:
-            print("-"*30)
-
+        return "Invalid: box is a clue"
+    else:
+        return "Valid"
