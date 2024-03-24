@@ -64,5 +64,8 @@ def do_move(val, row, col):
     elif puzzle[col+row*9] != " ":
         square.val = prev
         return "Invalid: box is a clue"
+    elif val not in "0123456789":
+        square.val = prev
+        return "Invalid: value must be a digit"
     else:
         return "Valid"
