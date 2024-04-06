@@ -1,3 +1,7 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+import model
+
 class Group:
     def __init__(self):
         self.vals = []
@@ -48,10 +52,23 @@ class Square:
 rows = [Group() for i in range(9)]
 cols = [Group() for i in range(9)]
 boxes = [Group() for i in range(9)]
-puzzle = " 7 583 2  592  3  34   65 7795   632  36971  68   27  914835 76 3 7 1495567429 13"
+
+puzzle = ""
+
+
+def get_puzzle(id):
+    engine = create_engine('sqlite:///sudoku.sqlite', echo=True)
+    sess = Session(engine)
+    puzzle = sess.query(model.Puzzle).get(id).puzzle
+    sess.close()
+    return puzzle
+
+
+puzzle = get_puzzle(2)
+
 for row in range(9):
     for col in range(9):
-        Square(puzzle[col+row*9], row, col, rows, cols, boxes)
+        Square(puzzle[col + row * 9], row, col, rows, cols, boxes)
 
 
 def do_move(val, row, col):
@@ -61,7 +78,7 @@ def do_move(val, row, col):
     if not (square.row.check_valid() and square.col.check_valid() and square.box.check_valid()):
         square.val = prev
         return "Invalid: number may only appear once a row, column or 3x3 box"
-    elif puzzle[col+row*9] != " ":
+    elif puzzle[col + row * 9] != " ":
         square.val = prev
         return "Invalid: box is a clue"
     elif val not in "0123456789":

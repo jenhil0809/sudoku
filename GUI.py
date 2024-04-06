@@ -21,8 +21,10 @@ class Game(tk.Frame):
                                   command=lambda val=i: self.button_clicked(val)) for i in range(81)]
         self.squares[0].config(bg="lightblue1")
         self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=master.val)
-        self.row_input = tk.Scale(self, from_=1, to=9, orient="horizontal", variable=master.row, command=self.changed_coord)
-        self.col_input = tk.Scale(self, from_=1, to=9, orient="horizontal", variable=master.col, command=self.changed_coord)
+        self.row_input = tk.Scale(self, from_=1, to=9, orient="horizontal", variable=master.row,
+                                  command=self.changed_coord)
+        self.col_input = tk.Scale(self, from_=1, to=9, orient="horizontal", variable=master.col,
+                                  command=self.changed_coord)
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         self.error_message = tk.Label(self, text="", wraplength=100)
         self.place_widgets()
@@ -37,7 +39,6 @@ class Game(tk.Frame):
         for square in self.squares:
             square.config(bg="light grey")
         self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)].config(bg="lightblue1")
-
 
     def change_val(self):
         if main.do_move(str(self.master.val.get()), self.master.row.get() - 1, self.master.col.get() - 1) == "Valid":
