@@ -10,7 +10,15 @@ class Puzzle:
                              for k in range(3) for l in range(3)])
 
     def do_move(self, val, x, y):
-        self.squares[(x, y)].set_value(val)
+        if x not in "012345678" or y not in "012345678":
+            return 2
+        if val not in "0123456789":
+            return 3
+        if not self.squares[(int(x), int(y))].original:
+            self.squares[(int(x), int(y))].set_value(val)
+            return 0
+        else:
+            return 1
 
 
 class Square:
