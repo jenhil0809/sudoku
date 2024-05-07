@@ -9,6 +9,9 @@ class Puzzle:
                           + [tuple([(i + k * 3, j + l * 3) for i in range(3) for j in range(3)])
                              for k in range(3) for l in range(3)])
 
+    def do_move(self, val, x, y):
+        self.squares[(x, y)].set_value(val)
+
 
 class Square:
     def __init__(self, x, y):
@@ -24,11 +27,3 @@ class Square:
     def set_original(self, val):
         self.original = True
         self.val = val
-
-
-puzzle = Puzzle(" 7 583 2  592  3  34   65 7795   632  36971  68   27  914835 76 3 7 1495567429 13")
-for i in range(9):
-    lst = []
-    while len(lst) < 9:
-        lst.append(puzzle.squares[(i, len(lst))].val)
-    print(lst)
