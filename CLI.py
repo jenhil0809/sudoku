@@ -8,9 +8,7 @@ def display_puzzle(text):
         if i == 2 or i == 5:
             print("-" * 30)
 
-
 solved = False
-# this should be loaded from a database
 # puzzle = new.Puzzle(" 7 583 2  592  3  34   65 7795   632  36971  68   27  914835 76 3 7 1495567429 13")
 puzzle = new.Puzzle("53467891267219534819834256785976142342685379171392485696153728428741963534528617 ")
 display_puzzle(puzzle)

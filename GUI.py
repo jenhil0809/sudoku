@@ -1,4 +1,4 @@
-import main
+import new
 import tkinter as tk
 
 
@@ -9,6 +9,7 @@ class GameApp(tk.Tk):
         self.row = tk.IntVar()
         self.col = tk.IntVar()
         self.val = tk.IntVar()
+        self.puzzle = new.Puzzle(" 7 583 2  592  3  34   65 7795   632  36971  68   27  914835 76 3 7 1495567429 13")
         self.game = Game(self)
         self.game.pack()
 
@@ -17,8 +18,11 @@ class Game(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
         self.master: GameApp = master
-        self.squares = [tk.Button(self, text=main.puzzle[i], height=2, width=5, bg="light grey",
+        self.squares = [tk.Button(self, text=master.puzzle.squares[(i // 9, i % 9)].val, height=2, width=5, bg="light grey",
                                   command=lambda val=i: self.button_clicked(val)) for i in range(81)]
+        for i in range(81):
+            if master.puzzle.squares[(i // 9, i % 9)].val == "0":
+                self.squares[i].config(text=" ")
         self.squares[0].config(bg="lightblue1")
         self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=master.val)
         self.row_input = tk.Scale(self, from_=1, to=9, orient="horizontal", variable=master.row,
@@ -41,7 +45,7 @@ class Game(tk.Frame):
         self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)].config(bg="lightblue1")
 
     def change_val(self):
-        if main.do_move(str(self.master.val.get()), self.master.row.get() - 1, self.master.col.get() - 1) == "Valid":
+        if self.master.puzzle.do_move(str(self.master.val.get()), str(self.master.row.get() - 1), str(self.master.col.get() - 1)) in [0, -1]:
             if self.master.val.get() != 0:
                 self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)] = tk.Button(self, text=str(
                     self.master.val.get()), height=2, width=5)
@@ -52,7 +56,7 @@ class Game(tk.Frame):
             self.error_message.config(text="")
         else:
             self.error_message.config(
-                text=main.do_move(str(self.master.val.get()), self.master.row.get() - 1, self.master.col.get() - 1))
+                text=self.master.puzzle.do_move(str(self.master.val.get()), str(self.master.row.get() - 1), str(self.master.col.get() - 1)))
         self.place_widgets()
 
     def place_widgets(self):
