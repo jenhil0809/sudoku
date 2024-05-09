@@ -1,3 +1,8 @@
+class Game:
+    def __init__(self):
+        pass
+
+
 class Puzzle:
     def __init__(self, start):
         self.squares = {(i, j): Square(i, j) for i in range(9) for j in range(9)}
@@ -7,9 +12,10 @@ class Puzzle:
         self.sets = tuple([tuple([(i, j) for i in range(9)]) for j in range(9)]
                           + [tuple([(j, i) for i in range(9)]) for j in range(9)]
                           + [tuple([(i + k * 3, j + l * 3) for i in range(3) for j in range(3)])
-                             for k in range(3) for l in range(3)]) # each of the 9 rows, columns and boxes
+                             for k in range(3) for l in range(3)])  # each of the 9 rows, columns and boxes
 
     # carries out a move after validating it
+    # replace returning integers with raising error statements
     def do_move(self, val, x, y):
         if x not in "012345678" or y not in "012345678":
             return 2  # square does not exist

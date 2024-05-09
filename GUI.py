@@ -18,7 +18,8 @@ class Game(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
         self.master: GameApp = master
-        self.squares = [tk.Button(self, text=master.puzzle.squares[(i // 9, i % 9)].val, height=2, width=5, bg="light grey",
+        self.squares = [tk.Button(self, text=master.puzzle.squares[(i // 9, i % 9)].val, height=2, width=5, bg="light "
+                                                                                                               "grey",
                                   command=lambda val=i: self.button_clicked(val)) for i in range(81)]
         for i in range(81):
             if master.puzzle.squares[(i // 9, i % 9)].val == "0":
@@ -45,7 +46,8 @@ class Game(tk.Frame):
         self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)].config(bg="lightblue1")
 
     def change_val(self):
-        if self.master.puzzle.do_move(str(self.master.val.get()), str(self.master.row.get() - 1), str(self.master.col.get() - 1)) in [0, -1]:
+        if self.master.puzzle.do_move(str(self.master.val.get()), str(self.master.row.get() - 1),
+                                      str(self.master.col.get() - 1)) in [0, -1]:
             if self.master.val.get() != 0:
                 self.squares[(self.master.row.get() - 1) * 9 + (self.master.col.get() - 1)] = tk.Button(self, text=str(
                     self.master.val.get()), height=2, width=5)
@@ -56,7 +58,8 @@ class Game(tk.Frame):
             self.error_message.config(text="")
         else:
             self.error_message.config(
-                text=self.master.puzzle.do_move(str(self.master.val.get()), str(self.master.row.get() - 1), str(self.master.col.get() - 1)))
+                text=self.master.puzzle.do_move(str(self.master.val.get()), str(self.master.row.get() - 1),
+                                                str(self.master.col.get() - 1)))
         self.place_widgets()
 
     def place_widgets(self):
