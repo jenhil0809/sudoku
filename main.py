@@ -95,3 +95,32 @@ class Puzzle:
             return True
         else:
             return False
+
+
+class Game:
+    def __init__(self):
+        self.puzzle: Puzzle | None = None
+        self.size = 81
+
+    def load_game(self, mode, *args):
+        if mode == "User":
+            if len(args[0]) == self.size:
+                self.puzzle = Puzzle(args[0])
+                return True
+            else:
+                return False
+        elif mode == "Load":
+            try:
+                user_input = int(args[0])
+                with open("puzzles.txt", "r") as file:
+                    self.puzzle = Puzzle(file.readlines()[user_input])
+                    return True
+            except:
+                return False
+            pass
+
+        else:
+            self.generate_puzzle()
+
+    def generate_puzzle(self):
+        pass
