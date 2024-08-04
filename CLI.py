@@ -1,14 +1,15 @@
 import main
 
+puzzle = main.Puzzle("070583020059200300340006507795000632003697100680002700914835076030701495567429013")
 txt = "{:^3}{:^3}{:^3}|{:^3}{:^3}{:^3}|{:^3}{:^3}{:^3}"
 while True:
     row = int(input("row"))
     col = int(input("col"))
     val = input("val")
-    x = main.do_move(val, row, col)
-    if x != "Valid":
-        print(x)
+    puzzle.change_value(col+row*9, val)
+    #if x != "Valid":
+    #    print(x)
     for i in range(9):
-        print(txt.format(*[square.val for square in main.rows[i].vals]))
+        print(txt.format(*[cell.val for cell in puzzle.squares[i*9:i*9+9]]))
         if i == 2 or i == 5:
             print("-"*30)
