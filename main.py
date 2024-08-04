@@ -69,7 +69,10 @@ class Puzzle:
         # Every square filled
         if self.squares[i] == self.squares[-1]:
             if not [cell.val for cell in self.squares][:-1] == excl:
-                return True
+                for n in range(1, 10):
+                    self.squares[i].set_value(str(n))
+                    if self.check_valid():
+                        return True
             else:
                 self.squares[i].set_value("0")
                 return False
@@ -86,3 +89,9 @@ class Puzzle:
             self.squares[i].set_value("0")
         return False
 
+    @property
+    def completed(self):
+        if self.check_valid() and "0" not in [cell.val for cell in self.squares]:
+            return True
+        else:
+            return False
