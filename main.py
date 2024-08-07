@@ -1,3 +1,6 @@
+from random import choice, randint
+
+
 class Square:
     def __init__(self, val):
         self.original = False
@@ -115,12 +118,43 @@ class Game:
                 with open("puzzles.txt", "r") as file:
                     self.puzzle = Puzzle(file.readlines()[user_input])
                     return True
-            except:
+            except IndexError:
                 return False
             pass
 
         else:
-            self.generate_puzzle()
+            while not self.generate_puzzle():
+                self.generate_puzzle()
 
     def generate_puzzle(self):
-        pass
+        self.puzzle = Puzzle("0" * self.size)
+        # Generate a full grid
+        for cell in self.puzzle.squares:
+            vals = [str(num) for num in range(1, 10)]
+            val = choice(vals)
+            cell.set_value(choice(val))
+            vals.remove(val)
+            while not self.puzzle.check_valid():
+                try:
+                    val = choice(vals)
+                    cell.set_value(choice(val))
+                    vals.remove(val)
+                except IndexError:
+                    return False
+        # Remove values
+        for i in range(20):
+            n, prev = self.create_blank()
+            while prev == "0" or self.puzzle.num_solutions() != 1:
+                self.puzzle.squares[n].set_value(prev)
+                n, prev = self.create_blank()
+
+        return True
+
+    def create_blank(self):
+        n = randint(0, 80)
+        prev = self.puzzle.squares[n].val
+        self.puzzle.squares[n].original = False
+        self.puzzle.squares[n].original_val = "0"
+        self.puzzle.squares[n].set_value("0")
+        self.puzzle = Puzzle("".join([cell.val for cell in self.puzzle.squares]))
+        return n, prev
