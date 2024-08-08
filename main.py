@@ -101,18 +101,18 @@ class Puzzle:
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, size: int = 81):
         self.puzzle: Puzzle | None = None
-        self.size = 81
+        self.size = size
 
     def load_game(self, mode, *args):
-        if mode == "User":
+        if mode == "user":
             if len(args[0]) == self.size:
                 self.puzzle = Puzzle(args[0])
                 return True
             else:
                 return False
-        elif mode == "Load":
+        elif mode == "load":
             try:
                 user_input = int(args[0])
                 with open("puzzles.txt", "r") as file:
@@ -122,9 +122,13 @@ class Game:
                 return False
             pass
 
-        else:
+        elif mode == "generate":
             while not self.generate_puzzle():
                 self.generate_puzzle()
+            return True
+
+        else:
+            return False
 
     def generate_puzzle(self):
         self.puzzle = Puzzle("0" * self.size)
