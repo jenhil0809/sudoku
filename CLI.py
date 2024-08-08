@@ -1,4 +1,5 @@
 import main
+from random import randint
 
 
 def load_game(size: int = 81):
@@ -12,7 +13,7 @@ def get_puzzle(game: main.Game):
     elif typ == "load":
         return game.load_game(typ, input("Line No: "))
     else:
-        return game.load_game(typ)
+        return game.load_game(typ, randint(10, 30))
 
 
 def print_puzzle(puzzle: main.Puzzle):

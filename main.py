@@ -123,14 +123,14 @@ class Game:
             pass
 
         elif mode == "generate":
-            while not self.generate_puzzle():
-                self.generate_puzzle()
+            while not self.generate_puzzle(args[0]):
+                self.generate_puzzle(args[0])
             return True
 
         else:
             return False
 
-    def generate_puzzle(self):
+    def generate_puzzle(self, blanks):
         self.puzzle = Puzzle("0" * self.size)
         # Generate a full grid
         for cell in self.puzzle.squares:
@@ -146,7 +146,7 @@ class Game:
                 except IndexError:
                     return False
         # Remove values
-        for i in range(20):
+        for i in range(blanks):
             n, prev = self.create_blank()
             while prev == "0" or self.puzzle.num_solutions() != 1:
                 self.puzzle.squares[n].set_value(prev)
