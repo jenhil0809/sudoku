@@ -39,6 +39,7 @@ class Group:
 class Puzzle:
     def __init__(self, puzzle):
         self.squares = [Square(puzzle[i]) for i in range(81)]
+        self.size = len(self.squares)
         self.groups = ([Group([self.squares[i + j * 9] for i in range(9)]) for j in range(9)] +
                        [Group([self.squares[i * 9 + j] for i in range(9)]) for j in range(9)] +
                        [Group([self.squares[(i // 3) * 9 + i % 3 + (j % 3) * 3 + (j // 3) * 27] for i in range(9)]) for
@@ -76,6 +77,8 @@ class Puzzle:
                     self.squares[i].set_value(str(n))
                     if self.check_valid():
                         return True
+                    else:
+                        return False
             else:
                 self.squares[i].set_value("0")
                 return False
@@ -151,8 +154,10 @@ class Game:
             while prev == "0" or self.puzzle.num_solutions() != 1:
                 self.puzzle.squares[n].set_value(prev)
                 n, prev = self.create_blank()
-
-        return True
+        if [cell.val for cell in self.puzzle.squares].count("0") == blanks:
+            return True
+        else:
+            return False
 
     def create_blank(self):
         n = randint(0, 80)
@@ -162,3 +167,9 @@ class Game:
         self.puzzle.squares[n].set_value("0")
         self.puzzle = Puzzle("".join([cell.val for cell in self.puzzle.squares]))
         return n, prev
+
+
+if __name__ == "__main__":
+    game = Game()
+    game.load_game("generate", 40)
+    print("".join([cell.val for cell in game.puzzle.squares]))

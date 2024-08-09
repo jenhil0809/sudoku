@@ -87,9 +87,9 @@ def test_completed():
 
 def test_load_game():
     assert game.puzzle is None
-    assert game.load_game("User",
+    assert game.load_game("user",
                           "070583020059200300340006507795000632003697100680002700914835076030701495567429013") is True
-    assert game.load_game("User",
+    assert game.load_game("user",
                           "07058302005920030034000650779500063200369710068000270091483507603070149556742901") is False
     assert [cell.val for cell in game.puzzle.squares] == ['0', '7', '0', '5', '8', '3', '0', '2', '0', '0', '5', '9',
                                                           '2', '0', '0', '3', '0', '0', '3', '4', '0', '0', '0', '6',
