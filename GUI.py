@@ -10,13 +10,49 @@ class GameApp(tk.Tk):
         self.col = tk.IntVar()
         self.val = tk.IntVar()
         self.game = main.Game()
-        self.game.load_game("user",
-                            "070583020059200300340006507795000632003697100680002700914835076030701495567429013")
-        self.sudoku_grid = Game(self)
-        self.sudoku_grid.pack()
+        self.frame = LoadGameFrame(self)
+        self.new_frame(LoadGameFrame(self))
+
+    def new_frame(self, frame):
+        self.frame.destroy()
+        self.frame = frame
+        self.frame.pack()
 
 
-class Game(tk.Frame):
+class LoadGameFrame(tk.Frame):
+    def __init__(self, master: GameApp):
+        super().__init__()
+        self.master: GameApp = master
+        self.user_game = tk.StringVar()
+        self.line_number = tk.StringVar()
+        self.generate = tk.Button(self, text="Generate", command=self.generate_game)
+        self.user = tk.Button(self, text="User input", command=self.input_game)
+        self.load = tk.Button(self, text="Load", command=self.load_game)
+        self.user_game_input = tk.Entry(self, textvariable=self.user_game)
+        self.line_input = tk.Entry(self, textvariable=self.line_number)
+        self.place_widgets()
+
+    def generate_game(self):
+        if self.master.game.load_game("generate", 10):
+            self.master.new_frame(SudokuGrid(self.master))
+
+    def input_game(self):
+        if self.master.game.load_game("user", self.user_game.get()):
+            self.master.new_frame(SudokuGrid(self.master))
+
+    def load_game(self):
+        if self.master.game.load_game("load", self.line_number.get()):
+            self.master.new_frame(SudokuGrid(self.master))
+
+    def place_widgets(self):
+        self.generate.grid(row=0, column=0, columnspan=2)
+        self.user.grid(row=1, column=0)
+        self.user_game_input.grid(row=1, column=1)
+        self.load.grid(row=2, column=0)
+        self.line_input.grid(row=2, column=1)
+
+
+class SudokuGrid(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
         self.master: GameApp = master
@@ -42,9 +78,9 @@ class Game(tk.Frame):
         self.squares[(self.master.row.get()) * 9 + (self.master.col.get())].config(bg="lightblue1")
 
     def change_val(self):
-        self.master.game.puzzle.change_value(9*(self.master.row.get())+self.master.col.get(),
+        self.master.game.puzzle.change_value(9 * (self.master.row.get()) + self.master.col.get(),
                                              str(self.master.val.get()))
-        self.squares[9*(self.master.row.get())+self.master.col.get()].config(text=str(self.master.val.get()))
+        self.squares[9 * (self.master.row.get()) + self.master.col.get()].config(text=str(self.master.val.get()))
         self.place_widgets()
 
     def place_widgets(self):
