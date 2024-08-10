@@ -1,11 +1,13 @@
 import main
 import tkinter as tk
+from time import sleep
 
 
 class GameApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Sudoku")
+        self.geometry("700x600")
         self.row = tk.IntVar()
         self.col = tk.IntVar()
         self.val = tk.IntVar()
@@ -61,6 +63,8 @@ class SudokuGrid(tk.Frame):
         for i in range(81):
             if master.game.puzzle.squares[i].val == "0":
                 self.squares[i].config(text=" ")
+            else:
+                self.squares[i].config(font='SegoeIU 9 bold')
         self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=master.val)
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         self.error_message = tk.Label(self, text="", wraplength=100)
@@ -81,7 +85,14 @@ class SudokuGrid(tk.Frame):
         self.master.game.puzzle.change_value(9 * (self.master.row.get()) + self.master.col.get(),
                                              str(self.master.val.get()))
         self.squares[9 * (self.master.row.get()) + self.master.col.get()].config(text=str(self.master.val.get()))
-        self.place_widgets()
+        if self.master.game.puzzle.completed:
+            for cell in self.squares:
+                cell.config(bg="green")
+            self.master.frame.update_idletasks()
+            sleep(2)
+            self.master.new_frame(LoadGameFrame(self.master))
+        else:
+            self.place_widgets()
 
     def place_widgets(self):
         for i in range(81):
