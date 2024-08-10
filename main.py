@@ -5,6 +5,7 @@ class Square:
     def __init__(self, val):
         self.original = False
         self.original_val = "0"
+        self.guesses = []
         if val == "0":
             self.val = "0"
         else:
@@ -14,6 +15,11 @@ class Square:
     def set_value(self, val):
         if not self.original:
             self.val = val
+
+    def add_guess(self, val):
+        if val not in self.guesses:
+            self.guesses.append(val)
+            self.guesses.sort()
 
     # If one of the original cells, set the value and prevent any future changes
     def set_original(self, val):
@@ -49,6 +55,9 @@ class Puzzle:
     # Change a cell in the grid using its coordinates
     def change_value(self, square, val):
         self.squares[square].set_value(val)
+
+    def add_guess(self, square, val):
+        self.squares[square].add_guess(val)
 
     # Return true if no repeated values in any group
     def check_valid(self):
