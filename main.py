@@ -86,8 +86,6 @@ class Puzzle:
                     self.squares[i].set_value(str(n))
                     if self.check_valid():
                         return True
-                    else:
-                        return False
             else:
                 self.squares[i].set_value("0")
                 return False
@@ -180,5 +178,7 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.load_game("generate", 40)
+    #game.load_game("generate", 40)
+    game.load_game("user", "003020600900305001001806400008102900700000008006708200002609500800203009005010300")
+    print(game.puzzle.solve())
     print("".join([cell.val for cell in game.puzzle.squares]))
