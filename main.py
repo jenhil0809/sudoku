@@ -1,4 +1,5 @@
-from random import choice, randint
+from random import choice, randint, seed
+from time import perf_counter
 
 
 class Square:
@@ -37,8 +38,7 @@ class Group:
 
     @property
     def valid(self):
-        vals = [square.val for square in self.squares]
-        vals = list(filter(lambda x: x != "0", vals))
+        vals = [square.val for square in self.squares if square.val != "0"]
         return len(vals) == len(set(vals))
 
 
@@ -86,18 +86,16 @@ class Puzzle:
                     self.squares[i].set_value(str(n))
                     if self.check_valid():
                         return True
-                    else:
-                        return False
             else:
                 self.squares[i].set_value("0")
                 return False
         # If already filled skip to next square
-        if self.squares[i].val != "0":
+        if self.squares[i].val != "0" and self.squares[i] != self.squares[-1]:
             return self.solve(i + 1, excl)
         # Else go through other 9 values until a solution is found
         for n in range(1, 10):
             self.squares[i].set_value(str(n))
-            if self.check_valid():
+            if self.check_valid() and self.squares[i] != self.squares[-1]:
                 if self.solve(i + 1, excl):
                     return True
             # Backtrack
@@ -179,6 +177,11 @@ class Game:
 
 
 if __name__ == "__main__":
+    seed(0)
     game = Game()
-    game.load_game("generate", 40)
+    start = perf_counter()
+    for i in range(20):
+        game.load_game("load", i)
+        game.puzzle.solve()
+    print(perf_counter()-start)
     print("".join([cell.val for cell in game.puzzle.squares]))
