@@ -153,7 +153,7 @@ class Game:
                     val = choice(vals)
                     cell.set_value(choice(val))
                     vals.remove(val)
-                except IndexError:
+                except IndexError: # All possible values tried and invalid
                     return False
         # Remove values
         for i in range(blanks):
@@ -179,9 +179,5 @@ class Game:
 if __name__ == "__main__":
     seed(0)
     game = Game()
-    start = perf_counter()
-    for i in range(20):
-        game.load_game("load", i)
-        game.puzzle.solve()
-    print(perf_counter()-start)
+    game.load_game("generate", 30)
     print("".join([cell.val for cell in game.puzzle.squares]))
