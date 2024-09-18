@@ -4,13 +4,14 @@ from matplotlib import pyplot as plt
 
 game = main.Game()
 times = []
-blanks = [i for i in range(0, 60)]
-for i in range(0, 60):
+blanks = [i for i in range(0, 50)]
+for i in range(0, 50):
     t_start = perf_counter()
-    for n in range(5):
-        game.load_game("generate", 0)
+    print(i)
+    for n in range(1):
+        game.load_game("generate", i)
     t_end = perf_counter()
-    times.append((t_end-t_start)/5)
+    times.append((t_end-t_start)/1)
 
 plt.scatter(blanks, times)
 plt.show()
