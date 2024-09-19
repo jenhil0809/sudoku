@@ -119,7 +119,7 @@ class Game:
         if mode == "user":
             if len(args[0]) == self.size:
                 self.puzzle = Puzzle(args[0])
-                return True
+                return self.puzzle.num_solutions() == 1
             else:
                 return False
         elif mode == "load":

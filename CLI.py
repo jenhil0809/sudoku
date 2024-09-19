@@ -27,8 +27,8 @@ def print_puzzle(puzzle: main.Puzzle):
 def solve_puzzle(puzzle: main.Puzzle):
     print_puzzle(puzzle)
     while not puzzle.completed:
-        row = int(input("row"))
-        col = int(input("col"))
+        row = int(input("row"))-1
+        col = int(input("col"))-1
         val = input("val")
         puzzle.change_value(col + row * 9, val)
         # if move != "Valid":
