@@ -74,7 +74,18 @@ class SudokuGrid(tk.Frame):
         self.place_widgets()
 
     def solve(self):
-        pass
+        previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
+        for cell in self.master.game.puzzle.squares:
+            if not cell.original:
+                cell.reset()
+        self.master.game.puzzle.solve()
+        for i in range(len(self.squares)):
+            if self.master.game.puzzle.squares[i].original:
+                pass
+            elif previous_vals[i] == self.master.game.puzzle.squares[i].val:
+                self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="green")
+            else:
+                self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="red")
 
     def button_clicked(self, val):
         if self.master.coord.get() >= 1000:
@@ -105,8 +116,9 @@ class SudokuGrid(tk.Frame):
                 self.place_widgets()
         else:
             self.master.game.puzzle.change_value(self.master.coord.get(),
-                                                     str(self.master.val.get()))
-            self.squares[self.master.coord.get()].config(text=str(self.master.game.puzzle.squares[self.master.coord.get()].val))
+                                                 str(self.master.val.get()))
+            self.squares[self.master.coord.get()].config(
+                text=str(self.master.game.puzzle.squares[self.master.coord.get()].val))
             if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
                 self.squares[self.master.coord.get()].config(text=" ")
             if self.master.game.puzzle.completed:
