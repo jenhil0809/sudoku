@@ -62,6 +62,7 @@ class SudokuGrid(tk.Frame):
         self.guesses = [tk.Button(self, text=" ", height=1, width=5, bg="light grey",
                                   command=lambda val=i: self.button_clicked(val + 1000), font='SegoeIU 6') for i in
                         range(81)]
+        self.complete = tk.Button(self, text="Complete puzzle", command=self.solve)
         for i in range(81):
             if master.game.puzzle.squares[i].val == "0":
                 self.squares[i].config(text=" ")
@@ -71,6 +72,9 @@ class SudokuGrid(tk.Frame):
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         # self.error_message = tk.Label(self, text="", wraplength=100)
         self.place_widgets()
+
+    def solve(self):
+        pass
 
     def button_clicked(self, val):
         if self.master.coord.get() >= 1000:
@@ -100,11 +104,10 @@ class SudokuGrid(tk.Frame):
                 self.guesses[self.master.coord.get() - 1000].config(text=" ")
                 self.place_widgets()
         else:
-            if self.master.val.get() != 0:
-                self.master.game.puzzle.change_value(self.master.coord.get(),
+            self.master.game.puzzle.change_value(self.master.coord.get(),
                                                      str(self.master.val.get()))
-                self.squares[self.master.coord.get()].config(text=str(self.master.val.get()))
-            else:
+            self.squares[self.master.coord.get()].config(text=str(self.master.game.puzzle.squares[self.master.coord.get()].val))
+            if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
                 self.squares[self.master.coord.get()].config(text=" ")
             if self.master.game.puzzle.completed:
                 for cell in self.squares:
@@ -127,6 +130,7 @@ class SudokuGrid(tk.Frame):
         tk.Label(self, text="Value:").grid(row=1, column=12)
         self.val_input.grid(row=0, column=13, rowspan=2)
         self.submit_button.grid(row=3, column=13)
+        self.complete.grid(row=4, column=13)
         # self.error_message.grid(row=4, column=12, columnspan=2, rowspan=3)
 
 

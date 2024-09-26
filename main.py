@@ -54,7 +54,8 @@ class Puzzle:
 
     # Change a cell in the grid using its coordinates
     def change_value(self, square, val):
-        self.squares[square].set_value(val)
+        if not self.squares[square].original:
+            self.squares[square].set_value(val)
 
     def add_guess(self, square, val):
         self.squares[square].add_guess(val)
