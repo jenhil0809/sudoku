@@ -34,7 +34,7 @@ class LoadGameFrame(tk.Frame):
         self.place_widgets()
 
     def generate_game(self):
-        if self.master.game.load_game("generate", 10):
+        if self.master.game.load_game("generate", 30):
             self.master.new_frame(SudokuGrid(self.master))
 
     def input_game(self):
@@ -56,6 +56,7 @@ class LoadGameFrame(tk.Frame):
 class SudokuGrid(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
+        self.solved = False
         self.master: GameApp = master
         self.squares = [tk.Button(self, text=master.game.puzzle.squares[i].val, height=2, width=5, bg="light grey",
                                   command=lambda val=i: self.button_clicked(val)) for i in range(81)]
@@ -74,29 +75,34 @@ class SudokuGrid(tk.Frame):
         self.place_widgets()
 
     def solve(self):
-        previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
-        for cell in self.master.game.puzzle.squares:
-            if not cell.original:
-                cell.reset()
-        self.master.game.puzzle.solve()
-        for i in range(len(self.squares)):
-            if self.master.game.puzzle.squares[i].original:
-                pass
-            elif previous_vals[i] == self.master.game.puzzle.squares[i].val:
-                self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="green")
-            else:
-                self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="red")
+        if not self.solved:
+            self.solved = True
+            previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
+            for cell in self.master.game.puzzle.squares:
+                if not cell.original:
+                    cell.reset()
+            self.master.game.puzzle.solve()
+            for i in range(len(self.squares)):
+                if self.master.game.puzzle.squares[i].original:
+                    pass
+                elif previous_vals[i] == self.master.game.puzzle.squares[i].val:
+                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="green")
+                else:
+                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="red")
+        else:
+            self.master.new_frame(LoadGameFrame(self.master))
 
     def button_clicked(self, val):
-        if self.master.coord.get() >= 1000:
-            self.guesses[self.master.coord.get() - 1000].config(bg="light grey")
-        else:
-            self.squares[self.master.coord.get()].config(bg="light grey")
-        self.master.coord.set(val)
-        if self.master.coord.get() >= 1000:
-            self.guesses[self.master.coord.get() - 1000].config(bg="lightblue1")
-        else:
-            self.squares[self.master.coord.get()].config(bg="lightblue1")
+        if not self.solved:
+            if self.master.coord.get() >= 1000:
+                self.guesses[self.master.coord.get() - 1000].config(bg="light grey")
+            else:
+                self.squares[self.master.coord.get()].config(bg="light grey")
+            self.master.coord.set(val)
+            if self.master.coord.get() >= 1000:
+                self.guesses[self.master.coord.get() - 1000].config(bg="lightblue1")
+            else:
+                self.squares[self.master.coord.get()].config(bg="lightblue1")
 
     def changed_coord(self):
         for square in self.squares:
@@ -104,31 +110,32 @@ class SudokuGrid(tk.Frame):
         self.squares[self.master.coord.get()].config(bg="lightblue1")
 
     def change_val(self):
-        if self.master.coord.get() >= 1000:
-            if self.master.val.get() != 0:
-                self.master.game.puzzle.add_guess(self.master.coord.get() - 1000, str(self.master.val.get()))
-                self.guesses[self.master.coord.get() - 1000].config(
-                    text="".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
-                self.place_widgets()
+        if not self.solved:
+            if self.master.coord.get() >= 1000:
+                if self.master.val.get() != 0:
+                    self.master.game.puzzle.add_guess(self.master.coord.get() - 1000, str(self.master.val.get()))
+                    self.guesses[self.master.coord.get() - 1000].config(
+                        text="".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
+                    self.place_widgets()
+                else:
+                    self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses = []
+                    self.guesses[self.master.coord.get() - 1000].config(text=" ")
+                    self.place_widgets()
             else:
-                self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses = []
-                self.guesses[self.master.coord.get() - 1000].config(text=" ")
-                self.place_widgets()
-        else:
-            self.master.game.puzzle.change_value(self.master.coord.get(),
-                                                 str(self.master.val.get()))
-            self.squares[self.master.coord.get()].config(
-                text=str(self.master.game.puzzle.squares[self.master.coord.get()].val))
-            if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
-                self.squares[self.master.coord.get()].config(text=" ")
-            if self.master.game.puzzle.completed:
-                for cell in self.squares:
-                    cell.config(bg="green")
-                self.master.frame.update_idletasks()
-                sleep(2)
-                self.master.new_frame(LoadGameFrame(self.master))
-            else:
-                self.place_widgets()
+                self.master.game.puzzle.change_value(self.master.coord.get(),
+                                                     str(self.master.val.get()))
+                self.squares[self.master.coord.get()].config(
+                    text=str(self.master.game.puzzle.squares[self.master.coord.get()].val))
+                if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
+                    self.squares[self.master.coord.get()].config(text=" ")
+                if self.master.game.puzzle.completed:
+                    for cell in self.squares:
+                        cell.config(bg="green")
+                    self.master.frame.update_idletasks()
+                    sleep(2)
+                    self.master.new_frame(LoadGameFrame(self.master))
+                else:
+                    self.place_widgets()
 
     def place_widgets(self):
         for i in range(81):

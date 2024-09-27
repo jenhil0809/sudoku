@@ -1,5 +1,4 @@
 from random import choice, randint, seed
-from time import perf_counter
 
 
 class Square:
@@ -154,7 +153,7 @@ class Game:
                     val = choice(vals)
                     cell.set_value(choice(val))
                     vals.remove(val)
-                except IndexError: # All possible values tried and invalid
+                except IndexError:  # All possible values tried and invalid
                     return False
         # Remove values
         for i in range(blanks):
