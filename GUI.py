@@ -1,6 +1,5 @@
 import main
 import tkinter as tk
-from time import sleep
 
 
 class GameApp(tk.Tk):
@@ -13,10 +12,24 @@ class GameApp(tk.Tk):
         self.game = main.Game()
         self.frame = LoadGameFrame(self)
         self.new_frame(LoadGameFrame(self))
+        self.guess_num = tk.IntVar()
+        self.setting_frame = SettingsFrame(self)
 
     def new_frame(self, frame):
         self.frame.destroy()
         self.frame = frame
+        frame.pack()
+        try:
+            self.setting_frame.pack_forget()
+        except AttributeError:
+            pass
+
+    def open_settings(self):
+        self.setting_frame.pack()
+        self.frame.pack_forget()
+
+    def close_settings(self):
+        self.setting_frame.pack_forget()
         self.frame.pack()
 
 
@@ -29,12 +42,16 @@ class LoadGameFrame(tk.Frame):
         self.generate = tk.Button(self, text="Generate", command=self.generate_game)
         self.user = tk.Button(self, text="User input", command=self.input_game)
         self.load = tk.Button(self, text="Load", command=self.load_game)
+        self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
         self.user_game_input = tk.Entry(self, textvariable=self.user_game)
         self.line_input = tk.Entry(self, textvariable=self.line_number)
         self.place_widgets()
 
+    def go_to_settings(self):
+        self.master.open_settings()
+
     def generate_game(self):
-        if self.master.game.load_game("generate", 30):
+        if self.master.game.load_game("generate", 35):
             self.master.new_frame(SudokuGrid(self.master))
 
     def input_game(self):
@@ -51,6 +68,7 @@ class LoadGameFrame(tk.Frame):
         self.user_game_input.grid(row=1, column=1)
         self.load.grid(row=2, column=0)
         self.line_input.grid(row=2, column=1)
+        self.settings.grid(row=3, column=0)
 
 
 class SudokuGrid(tk.Frame):
@@ -71,6 +89,7 @@ class SudokuGrid(tk.Frame):
                 self.squares[i].config(font='SegoeIU 9 bold')
         self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=master.val)
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
+        self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
         # self.error_message = tk.Label(self, text="", wraplength=100)
         self.place_widgets()
 
@@ -83,6 +102,7 @@ class SudokuGrid(tk.Frame):
                     cell.reset()
             self.master.game.puzzle.solve()
             for i in range(len(self.squares)):
+                self.complete.config(text="New puzzle")
                 if self.master.game.puzzle.squares[i].original:
                     pass
                 elif previous_vals[i] == self.master.game.puzzle.squares[i].val:
@@ -129,13 +149,12 @@ class SudokuGrid(tk.Frame):
                 if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
                     self.squares[self.master.coord.get()].config(text=" ")
                 if self.master.game.puzzle.completed:
-                    for cell in self.squares:
-                        cell.config(bg="green")
-                    self.master.frame.update_idletasks()
-                    sleep(2)
-                    self.master.new_frame(LoadGameFrame(self.master))
+                    self.solve()
                 else:
                     self.place_widgets()
+
+    def go_to_settings(self):
+        self.master.open_settings()
 
     def place_widgets(self):
         for i in range(81):
@@ -150,7 +169,24 @@ class SudokuGrid(tk.Frame):
         self.val_input.grid(row=0, column=13, rowspan=2)
         self.submit_button.grid(row=3, column=13)
         self.complete.grid(row=4, column=13)
+        self.settings.grid(row=5, column=13)
         # self.error_message.grid(row=4, column=12, columnspan=2, rowspan=3)
+
+
+class SettingsFrame(tk.Frame):
+    def __init__(self, master: GameApp):
+        super().__init__()
+        self.master: GameApp = master
+        self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.guess_num, orient="horizontal")
+        self.return_button = tk.Button(self, command=self.return_to_frame, text="Close settings")
+        self.place_widgets()
+
+    def return_to_frame(self):
+        self.master.close_settings()
+
+    def place_widgets(self):
+        self.hint_number.grid(row=0, column=0)
+        self.return_button.grid(row=1, column=0)
 
 
 if __name__ == "__main__":
