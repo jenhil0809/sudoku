@@ -12,7 +12,9 @@ class GameApp(tk.Tk):
         self.game = main.Game()
         self.frame = LoadGameFrame(self)
         self.new_frame(LoadGameFrame(self))
-        self.guess_num = tk.IntVar()
+        self.guess_num = tk.IntVar(value=3)
+        self.timer_on = tk.IntVar()
+        self.dimensions = tk.IntVar(value=9)
         self.setting_frame = SettingsFrame(self)
 
     def new_frame(self, frame):
@@ -51,7 +53,7 @@ class LoadGameFrame(tk.Frame):
         self.master.open_settings()
 
     def generate_game(self):
-        if self.master.game.load_game("generate", 35):
+        if self.master.game.load_game("generate", 30):
             self.master.new_frame(SudokuGrid(self.master))
 
     def input_game(self):
@@ -179,14 +181,37 @@ class SettingsFrame(tk.Frame):
         self.master: GameApp = master
         self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.guess_num, orient="horizontal")
         self.return_button = tk.Button(self, command=self.return_to_frame, text="Close settings")
+        self.timer = tk.Checkbutton(self, variable=self.master.timer_on)
+        self.timer.select()
+        # Time limit
+        self.sandwich = tk.Checkbutton(self)
+        self.dimensions = [(tk.Radiobutton(self, text=f"{i**2}x{i**2}", value=i**2, variable=self.master.dimensions)) for i in range(2,5)]
+        self.clash_highlight = tk.Checkbutton(self)
+        self.clash_highlight.select()
+        self.hints_highlight = tk.Checkbutton(self)
+        self.hints_highlight.select()
+        self.display_moves = tk.Checkbutton(self)
         self.place_widgets()
 
     def return_to_frame(self):
         self.master.close_settings()
 
     def place_widgets(self):
-        self.hint_number.grid(row=0, column=0)
-        self.return_button.grid(row=1, column=0)
+        tk.Label(self,text="Hint number").grid(row=0, column=0)
+        self.hint_number.grid(row=0, column=1)
+        tk.Label(self,text="Display timer").grid(row=1, column=0)
+        self.timer.grid(row=1, column=1)
+        tk.Label(self,text="Sandwich sudoku").grid(row=2, column=0)
+        self.sandwich.grid(row=2, column=1)
+        tk.Label(self,text="Highlight clashes").grid(row=3, column=0)
+        self.clash_highlight.grid(row=3, column=1)
+        tk.Label(self,text="Highlight hints").grid(row=4, column=0)
+        self.hints_highlight.grid(row=4, column=1)
+        tk.Label(self,text="Display moves").grid(row=5, column=0)
+        self.display_moves.grid(row=5, column=1)
+        for i in range(3):
+            self.dimensions[i].grid(row=6,column=i)
+        self.return_button.grid(row=7, column=0)
 
 
 if __name__ == "__main__":
