@@ -108,9 +108,9 @@ class SudokuGrid(tk.Frame):
                 if self.master.game.puzzle.squares[i].original:
                     pass
                 elif previous_vals[i] == self.master.game.puzzle.squares[i].val:
-                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="green")
+                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="palegreen")
                 else:
-                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="red")
+                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="firebrick1")
         else:
             self.master.new_frame(LoadGameFrame(self.master))
 
@@ -120,16 +120,29 @@ class SudokuGrid(tk.Frame):
                 self.guesses[self.master.coord.get() - 1000].config(bg="light grey")
             else:
                 self.squares[self.master.coord.get()].config(bg="light grey")
+                self.remove_highlights()
             self.master.coord.set(val)
             if self.master.coord.get() >= 1000:
-                self.guesses[self.master.coord.get() - 1000].config(bg="lightblue1")
+                self.guesses[self.master.coord.get() - 1000].config(bg="DeepSkyBlue2")
             else:
-                self.squares[self.master.coord.get()].config(bg="lightblue1")
+                self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
+                self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
+
+    def highlight(self, val):
+        if val != "0":
+            for i in range(len(self.squares)):
+                if self.master.game.puzzle.squares[i].val == val:
+                    self.squares[i].config(bg="lightblue1")
+
+    def remove_highlights(self):
+        for cell in self.squares:
+            if cell["bg"] == "lightblue1":
+                cell.config(bg="light grey")
 
     def changed_coord(self):
         for square in self.squares:
             square.config(bg="light grey")
-        self.squares[self.master.coord.get()].config(bg="lightblue1")
+        self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
 
     def change_val(self):
         if not self.solved:
@@ -153,6 +166,9 @@ class SudokuGrid(tk.Frame):
                 if self.master.game.puzzle.completed:
                     self.solve()
                 else:
+                    self.remove_highlights()
+                    self.highlight(str(self.master.val.get()))
+                    self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
                     self.place_widgets()
 
     def go_to_settings(self):
@@ -172,7 +188,6 @@ class SudokuGrid(tk.Frame):
         self.submit_button.grid(row=3, column=13)
         self.complete.grid(row=4, column=13)
         self.settings.grid(row=5, column=13)
-        # self.error_message.grid(row=4, column=12, columnspan=2, rowspan=3)
 
 
 class SettingsFrame(tk.Frame):
@@ -185,7 +200,9 @@ class SettingsFrame(tk.Frame):
         self.timer.select()
         # Time limit
         self.sandwich = tk.Checkbutton(self)
-        self.dimensions = [(tk.Radiobutton(self, text=f"{i**2}x{i**2}", value=i**2, variable=self.master.dimensions)) for i in range(2,5)]
+        self.dimensions = [
+            (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.dimensions)) for i in
+            range(2, 5)]
         self.clash_highlight = tk.Checkbutton(self)
         self.clash_highlight.select()
         self.hints_highlight = tk.Checkbutton(self)
@@ -197,20 +214,20 @@ class SettingsFrame(tk.Frame):
         self.master.close_settings()
 
     def place_widgets(self):
-        tk.Label(self,text="Hint number").grid(row=0, column=0)
+        tk.Label(self, text="Hint number").grid(row=0, column=0)
         self.hint_number.grid(row=0, column=1)
-        tk.Label(self,text="Display timer").grid(row=1, column=0)
+        tk.Label(self, text="Display timer").grid(row=1, column=0)
         self.timer.grid(row=1, column=1)
-        tk.Label(self,text="Sandwich sudoku").grid(row=2, column=0)
+        tk.Label(self, text="Sandwich sudoku").grid(row=2, column=0)
         self.sandwich.grid(row=2, column=1)
-        tk.Label(self,text="Highlight clashes").grid(row=3, column=0)
+        tk.Label(self, text="Highlight clashes").grid(row=3, column=0)
         self.clash_highlight.grid(row=3, column=1)
-        tk.Label(self,text="Highlight hints").grid(row=4, column=0)
+        tk.Label(self, text="Highlight hints").grid(row=4, column=0)
         self.hints_highlight.grid(row=4, column=1)
-        tk.Label(self,text="Display moves").grid(row=5, column=0)
+        tk.Label(self, text="Display moves").grid(row=5, column=0)
         self.display_moves.grid(row=5, column=1)
         for i in range(3):
-            self.dimensions[i].grid(row=6,column=i)
+            self.dimensions[i].grid(row=6, column=i)
         self.return_button.grid(row=7, column=0)
 
 
