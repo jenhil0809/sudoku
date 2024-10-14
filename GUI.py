@@ -9,6 +9,7 @@ class GameApp(tk.Tk):
         self.geometry("700x600")
         self.coord = tk.IntVar()
         self.val = tk.IntVar()
+        self.show_highlights = tk.IntVar()
         self.game = main.Game()
         self.frame = LoadGameFrame(self)
         self.new_frame(LoadGameFrame(self))
@@ -129,7 +130,7 @@ class SudokuGrid(tk.Frame):
                 self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
 
     def highlight(self, val):
-        if val != "0":
+        if val != "0" and self.master.show_highlights.get():
             for i in range(len(self.squares)):
                 if self.master.game.puzzle.squares[i].val == val:
                     self.squares[i].config(bg="lightblue1")
@@ -205,7 +206,7 @@ class SettingsFrame(tk.Frame):
             range(2, 5)]
         self.clash_highlight = tk.Checkbutton(self)
         self.clash_highlight.select()
-        self.hints_highlight = tk.Checkbutton(self)
+        self.hints_highlight = tk.Checkbutton(self, variable=self.master.show_highlights)
         self.hints_highlight.select()
         self.display_moves = tk.Checkbutton(self)
         self.place_widgets()
