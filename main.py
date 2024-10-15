@@ -42,13 +42,14 @@ class Group:
 
 
 class Puzzle:
-    def __init__(self, puzzle):
-        self.squares = [Square(puzzle[i]) for i in range(81)]
-        self.size = len(self.squares)
-        self.groups = ([Group([self.squares[i + j * 9] for i in range(9)]) for j in range(9)] +
-                       [Group([self.squares[i * 9 + j] for i in range(9)]) for j in range(9)] +
-                       [Group([self.squares[(i // 3) * 9 + i % 3 + (j % 3) * 3 + (j // 3) * 27] for i in range(9)]) for
-                        j in range(9)])
+    def __init__(self, puzzle, size: int=9, vals=[str(val+1) for val in range(9)]):
+        self.size = size
+        self.vals = vals
+        self.squares = [Square(puzzle[i]) for i in range(self.size**2)]
+        self.groups = ([Group([self.squares[i + j * self.size] for i in range(self.size)]) for j in range(self.size)] +
+                       [Group([self.squares[i * self.size + j] for i in range(self.size)]) for j in range(self.size)] +
+                       [Group([self.squares[int((i // (self.size**0.5)) * self.size + i % (self.size**0.5) + (j % (self.size**0.5)) * (self.size**0.5) + (j // (self.size**0.5)) * (self.size**1.5))] for i in range(self.size)]) for
+                        j in range(self.size)])
         self.check_valid()
 
     # Change a cell in the grid using its coordinates
@@ -82,7 +83,7 @@ class Puzzle:
         # Every square filled
         if self.squares[i] == self.squares[-1]:
             if not [cell.val for cell in self.squares][:-1] == excl:
-                for n in range(1, 10):
+                for n in self.vals:
                     self.squares[i].set_value(str(n))
                     if self.check_valid():
                         return True
@@ -93,7 +94,7 @@ class Puzzle:
         if self.squares[i].val != "0" and self.squares[i] != self.squares[-1]:
             return self.solve(i + 1, excl)
         # Else go through other 9 values until a solution is found
-        for n in range(1, 10):
+        for n in self.vals:
             self.squares[i].set_value(str(n))
             if self.check_valid() and self.squares[i] != self.squares[-1]:
                 if self.solve(i + 1, excl):
@@ -111,14 +112,18 @@ class Puzzle:
 
 
 class Game:
-    def __init__(self, size: int = 81):
+    def __init__(self, size: int = 9):
         self.puzzle: Puzzle | None = None
         self.size = size
+        if self.size==16:
+            self.vals=[char for char in "123456789ABCDEFGH"]
+        else:
+            self.vals=[str(digit+1) for digit in range(self.size)]
 
     def load_game(self, mode, *args):
         if mode == "user":
-            if len(args[0]) == self.size:
-                self.puzzle = Puzzle(args[0])
+            if len(args[0]) == self.size**2:
+                self.puzzle = Puzzle(args[0], self.size)
                 return self.puzzle.num_solutions() == 1
             else:
                 return False
@@ -126,7 +131,7 @@ class Game:
             try:
                 user_input = int(args[0])
                 with open("puzzles.txt", "r") as file:
-                    self.puzzle = Puzzle(file.readlines()[user_input])
+                    self.puzzle = Puzzle(file.readlines()[user_input], self.size)
                     return True
             except IndexError:
                 return False
@@ -141,10 +146,10 @@ class Game:
             return False
 
     def generate_puzzle(self, blanks):
-        self.puzzle = Puzzle("0" * self.size)
+        self.puzzle = Puzzle("0" * self.size**2, self.size)
         # Generate a full grid
         for cell in self.puzzle.squares:
-            vals = [str(num) for num in range(1, 10)]
+            vals = [val for val in self.vals]
             val = choice(vals)
             cell.set_value(choice(val))
             vals.remove(val)
@@ -167,17 +172,17 @@ class Game:
             return False
 
     def create_blank(self):
-        n = randint(0, 80)
+        n = randint(0, self.size**2-1)
         prev = self.puzzle.squares[n].val
         self.puzzle.squares[n].original = False
         self.puzzle.squares[n].original_val = "0"
         self.puzzle.squares[n].set_value("0")
-        self.puzzle = Puzzle("".join([cell.val for cell in self.puzzle.squares]))
+        self.puzzle = Puzzle("".join([cell.val for cell in self.puzzle.squares]), self.size)
         return n, prev
 
 
 if __name__ == "__main__":
     seed(0)
-    game = Game()
-    game.load_game("generate", 30)
+    game = Game(9)
+    game.load_game("generate", 20)
     print("".join([cell.val for cell in game.puzzle.squares]))

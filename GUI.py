@@ -93,7 +93,6 @@ class SudokuGrid(tk.Frame):
         self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=master.val)
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
-        # self.error_message = tk.Label(self, text="", wraplength=100)
         self.place_widgets()
 
     def solve(self):
