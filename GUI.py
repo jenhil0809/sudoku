@@ -1,5 +1,6 @@
 import main
 import tkinter as tk
+import keyboard
 
 
 class GameApp(tk.Tk):
@@ -8,7 +9,7 @@ class GameApp(tk.Tk):
         self.title("Sudoku")
         self.geometry("700x600")
         self.coord = tk.IntVar()
-        self.val = tk.IntVar()
+        self.val = tk.StringVar()
         self.show_highlights = tk.IntVar()
         self.game = main.Game()
         self.frame = LoadGameFrame(self)
@@ -76,6 +77,8 @@ class LoadGameFrame(tk.Frame):
 
 class SudokuGrid(tk.Frame):
     def __init__(self, master: GameApp):
+        for i in range(10):
+            self.create_keyboard_event(str(i))
         super().__init__()
         self.solved = False
         self.master: GameApp = master
@@ -90,10 +93,17 @@ class SudokuGrid(tk.Frame):
                 self.squares[i].config(text=" ")
             else:
                 self.squares[i].config(font='SegoeIU 9 bold')
-        self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=master.val)
+        self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=self.master.val)
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
         self.place_widgets()
+
+    def create_keyboard_event(self, x):
+        keyboard.on_press_key(x, lambda _: self.output(x))
+
+    def output(self, x):
+        self.master.val.set(x)
+        self.change_val()
 
     def solve(self):
         if not self.solved:
@@ -105,8 +115,9 @@ class SudokuGrid(tk.Frame):
             self.master.game.puzzle.solve()
             for i in range(len(self.squares)):
                 self.complete.config(text="New puzzle")
+                self.guesses[i].config(bg="light grey")
                 if self.master.game.puzzle.squares[i].original:
-                    pass
+                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="light grey")
                 elif previous_vals[i] == self.master.game.puzzle.squares[i].val:
                     self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="palegreen")
                 else:
@@ -147,7 +158,7 @@ class SudokuGrid(tk.Frame):
     def change_val(self):
         if not self.solved:
             if self.master.coord.get() >= 1000:
-                if self.master.val.get() != 0:
+                if self.master.val.get() != "0":
                     self.master.game.puzzle.add_guess(self.master.coord.get() - 1000, str(self.master.val.get()))
                     self.guesses[self.master.coord.get() - 1000].config(
                         text="".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
