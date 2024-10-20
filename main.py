@@ -52,6 +52,16 @@ class Puzzle:
                         j in range(self.size)])
         self.check_valid()
 
+    def return_clashes(self):
+        clash = []
+        for group in self.groups:
+            for i in group.squares:
+                for j in group.squares:
+                    if i.val == j.val and i.val != "0" and i != j:
+                        clash.append(self.squares.index(i))
+                        clash.append(self.squares.index(j))
+        return set(clash)
+
     # Change a cell in the grid using its coordinates
     def change_value(self, square, val):
         if not self.squares[square].original:

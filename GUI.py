@@ -16,6 +16,7 @@ class GameApp(tk.Tk):
         self.new_frame(LoadGameFrame(self))
         self.guess_num = tk.IntVar(value=3)
         self.timer_on = tk.IntVar()
+        self.clashes = tk.IntVar()
         self.dimensions = tk.IntVar(value=9)
         self.setting_frame = SettingsFrame(self)
 
@@ -138,6 +139,7 @@ class SudokuGrid(tk.Frame):
             else:
                 self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
                 self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
+        self.highlight_errors()
 
     def highlight(self, val):
         if val != "0" and self.master.show_highlights.get():
@@ -149,11 +151,6 @@ class SudokuGrid(tk.Frame):
         for cell in self.squares:
             if cell["bg"] == "lightblue1":
                 cell.config(bg="light grey")
-
-    def changed_coord(self):
-        for square in self.squares:
-            square.config(bg="light grey")
-        self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
 
     def change_val(self):
         if not self.solved:
@@ -181,6 +178,15 @@ class SudokuGrid(tk.Frame):
                     self.highlight(str(self.master.val.get()))
                     self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
                     self.place_widgets()
+        self.highlight_errors()
+
+    def highlight_errors(self):
+        for square in self.squares:
+            if square["bg"] == "firebrick1":
+                square.config(bg="light grey")
+        if self.master.clashes.get():
+            for i in self.master.game.puzzle.return_clashes():
+                self.squares[i].config(bg="firebrick1")
 
     def go_to_settings(self):
         self.master.open_settings()
@@ -214,7 +220,7 @@ class SettingsFrame(tk.Frame):
         self.dimensions = [
             (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.dimensions)) for i in
             range(2, 5)]
-        self.clash_highlight = tk.Checkbutton(self)
+        self.clash_highlight = tk.Checkbutton(self, variable=self.master.clashes)
         self.clash_highlight.select()
         self.hints_highlight = tk.Checkbutton(self, variable=self.master.show_highlights)
         self.hints_highlight.select()
