@@ -14,10 +14,11 @@ class GameApp(tk.Tk):
         self.game = main.Game()
         self.frame = LoadGameFrame(self)
         self.new_frame(LoadGameFrame(self))
-        self.guess_num = tk.IntVar(value=3)
-        self.timer_on = tk.IntVar()
-        self.clashes = tk.IntVar()
-        self.dimensions = tk.IntVar(value=9)
+        self.settings = {"guess_num":tk.IntVar(value=3),
+                         "timer_on":tk.IntVar(),
+                         "clashes":tk.IntVar(),
+                         "dimensions":tk.IntVar(value=9),
+                         "highlights":tk.IntVar(),}
         self.setting_frame = SettingsFrame(self)
 
     def new_frame(self, frame):
@@ -142,7 +143,7 @@ class SudokuGrid(tk.Frame):
         self.highlight_errors()
 
     def highlight(self, val):
-        if val != "0" and self.master.show_highlights.get():
+        if val != "0" and self.master.settings["highlights"].get():
             for i in range(len(self.squares)):
                 if self.master.game.puzzle.squares[i].val == val:
                     self.squares[i].config(bg="lightblue1")
@@ -184,7 +185,7 @@ class SudokuGrid(tk.Frame):
         for square in self.squares:
             if square["bg"] == "firebrick1":
                 square.config(bg="light grey")
-        if self.master.clashes.get():
+        if self.master.settings["clashes"].get():
             for i in self.master.game.puzzle.return_clashes():
                 self.squares[i].config(bg="firebrick1")
 
@@ -211,18 +212,18 @@ class SettingsFrame(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
         self.master: GameApp = master
-        self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.guess_num, orient="horizontal")
+        self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.settings["guess_num"], orient="horizontal")
         self.return_button = tk.Button(self, command=self.return_to_frame, text="Close settings")
-        self.timer = tk.Checkbutton(self, variable=self.master.timer_on)
+        self.timer = tk.Checkbutton(self, variable=self.master.settings["timer_on"])
         self.timer.select()
         # Time limit
         self.sandwich = tk.Checkbutton(self)
         self.dimensions = [
-            (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.dimensions)) for i in
+            (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.settings["dimensions"])) for i in
             range(2, 5)]
-        self.clash_highlight = tk.Checkbutton(self, variable=self.master.clashes)
+        self.clash_highlight = tk.Checkbutton(self, variable=self.master.settings["clashes"])
         self.clash_highlight.select()
-        self.hints_highlight = tk.Checkbutton(self, variable=self.master.show_highlights)
+        self.hints_highlight = tk.Checkbutton(self, variable=self.master.settings["highlights"])
         self.hints_highlight.select()
         self.display_moves = tk.Checkbutton(self)
         self.place_widgets()
