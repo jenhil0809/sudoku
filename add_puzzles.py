@@ -9,5 +9,5 @@ for i in range(5):
     puzzle = "".join([cell.val for cell in game.puzzle.squares])
     puzzles.append(puzzle)
 for puzzle in puzzles:
-    with open("puzzles.txt", "a") as file:
+    with open("puzzles9.txt", "a") as file:
         file.write(puzzle+"\n")

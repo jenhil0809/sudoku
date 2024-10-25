@@ -14,11 +14,11 @@ class GameApp(tk.Tk):
         self.game = main.Game()
         self.frame = LoadGameFrame(self)
         self.new_frame(LoadGameFrame(self))
-        self.settings = {"guess_num":tk.IntVar(value=3),
-                         "timer_on":tk.IntVar(),
-                         "clashes":tk.IntVar(),
-                         "dimensions":tk.IntVar(value=9),
-                         "highlights":tk.IntVar(),}
+        self.settings = {"guess_num": tk.IntVar(value=3),
+                         "timer_on": tk.IntVar(),
+                         "clashes": tk.IntVar(),
+                         "dimensions": tk.IntVar(value=9),
+                         "highlights": tk.IntVar(), }
         self.setting_frame = SettingsFrame(self)
 
     def new_frame(self, frame):
@@ -57,15 +57,15 @@ class LoadGameFrame(tk.Frame):
         self.master.open_settings()
 
     def generate_game(self):
-        if self.master.game.load_game("generate", 30):
+        if self.master.game.load_game("generate", "30", self.master.settings["dimensions"].get()):
             self.master.new_frame(SudokuGrid(self.master))
 
     def input_game(self):
-        if self.master.game.load_game("user", self.user_game.get()):
+        if self.master.game.load_game("user",self.user_game.get(), self.master.settings["dimensions"].get()):
             self.master.new_frame(SudokuGrid(self.master))
 
     def load_game(self):
-        if self.master.game.load_game("load", self.line_number.get()):
+        if self.master.game.load_game("load",  self.line_number.get(), self.master.settings["dimensions"].get()):
             self.master.new_frame(SudokuGrid(self.master))
 
     def place_widgets(self):
@@ -84,13 +84,19 @@ class SudokuGrid(tk.Frame):
         super().__init__()
         self.solved = False
         self.master: GameApp = master
-        self.squares = [tk.Button(self, text=master.game.puzzle.squares[i].val, height=2, width=5, bg="light grey",
-                                  command=lambda val=i: self.button_clicked(val)) for i in range(81)]
-        self.guesses = [tk.Button(self, text=" ", height=1, width=5, bg="light grey",
+        if self.master.settings["dimensions"].get() == 4:
+            h, w, self.pad = 4, 10, 5
+        elif self.master.settings["dimensions"].get() == 9:
+            h, w, self.pad = 2, 5, 5
+        else:
+            h, w, self.pad = 1, 2, 0
+        self.squares = [tk.Button(self, text=master.game.puzzle.squares[i].val, height=h, width=w, bg="light grey",
+                                  command=lambda val=i: self.button_clicked(val)) for i in range(self.master.settings["dimensions"].get()**2)]
+        self.guesses = [tk.Button(self, text=" ", height=1, width=w, bg="light grey",
                                   command=lambda val=i: self.button_clicked(val + 1000), font='SegoeIU 6') for i in
-                        range(81)]
+                        range(self.master.settings["dimensions"].get()**2)]
         self.complete = tk.Button(self, text="Complete puzzle", command=self.solve)
-        for i in range(81):
+        for i in range(self.master.settings["dimensions"].get()**2):
             if master.game.puzzle.squares[i].val == "0":
                 self.squares[i].config(text=" ")
             else:
@@ -193,33 +199,45 @@ class SudokuGrid(tk.Frame):
         self.master.open_settings()
 
     def place_widgets(self):
-        for i in range(81):
-            self.squares[i].grid(row=(i // 9) * 2 + 1 + i // 27, column=i % 9 + i % 9 // 3, padx=5, pady=0)
-        for i in range(81):
-            self.guesses[i].grid(row=(i // 9) * 2 + i // 27, column=i % 9 + i % 9 // 3, padx=5, pady=0)
-        tk.Label(self, text="_" * 100).grid(row=6, column=0, columnspan=11)
-        tk.Label(self, text="_" * 100).grid(row=13, column=0, columnspan=11)
-        tk.Label(self, text="|\n" * 35).grid(row=0, column=3, rowspan=22)
-        tk.Label(self, text="|\n" * 35).grid(row=0, column=7, rowspan=22)
-        tk.Label(self, text="Value:").grid(row=1, column=12)
-        self.val_input.grid(row=0, column=13, rowspan=2)
-        self.submit_button.grid(row=3, column=13)
-        self.complete.grid(row=4, column=13)
-        self.settings.grid(row=5, column=13)
+        for i in range(self.master.settings["dimensions"].get() ** 2):
+            self.squares[i].grid(row=i // self.master.settings["dimensions"].get() * 2 + 1 + i // int(
+                self.master.settings["dimensions"].get() ** 1.5),
+                                 column=i % int(self.master.settings["dimensions"].get()) + i % self.master.settings[
+                                     "dimensions"].get() // int(self.master.settings["dimensions"].get() ** .5), padx=self.pad,
+                                 pady=self.pad)
+        for i in range(self.master.settings["dimensions"].get() ** 2):
+            self.guesses[i].grid(row=i // int(self.master.settings["dimensions"].get()) * 2 + i // int(
+                self.master.settings["dimensions"].get() ** 1.5),
+                                 column=i % int(self.master.settings["dimensions"].get()) + i % int(
+                                     self.master.settings["dimensions"].get()) // int(
+                                     self.master.settings["dimensions"].get() ** .5), padx=self.pad, pady=0)
+        for i in range(int(self.master.settings["dimensions"].get() ** 0.5 - 1)):
+            print((self.master.settings["dimensions"].get() ** (0.5)) * 2 * (i + 1) + i)
+            tk.Label(self, text="_" * 100).grid(
+                row=int((self.master.settings["dimensions"].get() ** (0.5)) * 2 * (i + 1) + i), column=0, columnspan=int(self.master.settings["dimensions"].get()**0.5)+self.master.settings["dimensions"].get())
+            tk.Label(self, text="|\n" * 35).grid(row=0, column=int(
+                (self.master.settings["dimensions"].get() ** (0.5)) * (i + 1) + i), rowspan=int(self.master.settings["dimensions"].get()**0.5)+self.master.settings["dimensions"].get()*2)
+        tk.Label(self, text="Value:").grid(row=1, column=50)
+        self.val_input.grid(row=0, column=50, rowspan=2)
+        self.submit_button.grid(row=3, column=50)
+        self.complete.grid(row=4, column=50)
+        self.settings.grid(row=5, column=50)
 
 
 class SettingsFrame(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
         self.master: GameApp = master
-        self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.settings["guess_num"], orient="horizontal")
+        self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.settings["guess_num"],
+                                    orient="horizontal")
         self.return_button = tk.Button(self, command=self.return_to_frame, text="Close settings")
         self.timer = tk.Checkbutton(self, variable=self.master.settings["timer_on"])
         self.timer.select()
         # Time limit
         self.sandwich = tk.Checkbutton(self)
         self.dimensions = [
-            (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.settings["dimensions"])) for i in
+            (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.settings["dimensions"]))
+            for i in
             range(2, 5)]
         self.clash_highlight = tk.Checkbutton(self, variable=self.master.settings["clashes"])
         self.clash_highlight.select()

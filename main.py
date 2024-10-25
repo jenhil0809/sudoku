@@ -42,8 +42,14 @@ class Group:
 
 
 class Puzzle:
-    def __init__(self, puzzle, size: int=9, vals=[str(val+1) for val in range(9)]):
+    def __init__(self, puzzle, size: int=9):
         self.size = size
+        if self.size == 4:
+            vals = [str(val + 1) for val in range(4)]
+        elif self.size == 9:
+            vals = [str(val + 1) for val in range(9)]
+        else:
+            vals = [str(val + 1) for val in range(9)]+[char for char in "ABCDEFG"]
         self.vals = vals
         self.squares = [Square(puzzle[i]) for i in range(self.size**2)]
         self.groups = ([Group([self.squares[i + j * self.size] for i in range(self.size)]) for j in range(self.size)] +
@@ -130,26 +136,28 @@ class Game:
         else:
             self.vals=[str(digit+1) for digit in range(self.size)]
 
-    def load_game(self, mode, *args):
+    def load_game(self, mode, arg: str, size=9):
+        self.size=size
+        print(mode, arg, size)
         if mode == "user":
-            if len(args[0]) == self.size**2:
-                self.puzzle = Puzzle(args[0], self.size)
+            if len(arg) == self.size**2:
+                self.puzzle = Puzzle(arg, self.size)
                 return self.puzzle.num_solutions() == 1
             else:
                 return False
         elif mode == "load":
             try:
-                user_input = int(args[0])
-                with open("puzzles.txt", "r") as file:
+                user_input = int(arg)
+                print(f"puzzles{size}.txt")
+                with open(f"puzzles{size}.txt", "r") as file:
                     self.puzzle = Puzzle(file.readlines()[user_input], self.size)
                     return True
             except IndexError:
                 return False
-            pass
 
         elif mode == "generate":
-            while not self.generate_puzzle(args[0]):
-                self.generate_puzzle(args[0])
+            while not self.generate_puzzle(int(arg)):
+                self.generate_puzzle(int(arg))
             return True
 
         else:
@@ -194,5 +202,5 @@ class Game:
 if __name__ == "__main__":
     seed(0)
     game = Game(9)
-    game.load_game("generate", 20)
+    game.load_game("generate", "20", 9)
     print("".join([cell.val for cell in game.puzzle.squares]))
