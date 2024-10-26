@@ -1,6 +1,7 @@
 import main
 import tkinter as tk
 import keyboard
+import time
 
 
 class GameApp(tk.Tk):
@@ -79,11 +80,14 @@ class LoadGameFrame(tk.Frame):
 
 class SudokuGrid(tk.Frame):
     def __init__(self, master: GameApp):
-        for i in range(10):
-            self.create_keyboard_event(str(i))
         super().__init__()
-        self.solved = False
         self.master: GameApp = master
+        self.solved = False
+        self.start_time = time.time()
+        self.timer = tk.Label(self, text=f"{int(time.time()-self.start_time)}")
+        for char in self.master.game.puzzle.vals:
+            self.create_keyboard_event(char.lower())
+        self.create_keyboard_event("0")
         if self.master.settings["dimensions"].get() == 4:
             h, w, self.pad = 4, 10, 5
         elif self.master.settings["dimensions"].get() == 9:
@@ -101,10 +105,20 @@ class SudokuGrid(tk.Frame):
                 self.squares[i].config(text=" ")
             else:
                 self.squares[i].config(font='SegoeIU 9 bold')
-        self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=self.master.val)
+        #self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=self.master.val)
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
         self.place_widgets()
+        self.update_timer()
+
+    def update_timer(self):
+        if self.master.settings["timer_on"].get():
+            self.timer.config(text=f"Time: {int(time.time()-self.start_time)//60:02d}:{int(time.time()-self.start_time)%60:02d}")
+        else:
+            self.timer.config(text="")
+        tk.Tk.update(self)
+        self.after(1000, self.update_timer)
+
 
     def create_keyboard_event(self, x):
         keyboard.on_press_key(x, lambda _: self.output(x))
@@ -163,7 +177,7 @@ class SudokuGrid(tk.Frame):
         if not self.solved:
             if self.master.coord.get() >= 1000:
                 if self.master.val.get() != "0":
-                    self.master.game.puzzle.add_guess(self.master.coord.get() - 1000, str(self.master.val.get()))
+                    self.master.game.puzzle.add_guess(self.master.coord.get() - 1000, str(self.master.val.get()).upper())
                     self.guesses[self.master.coord.get() - 1000].config(
                         text="".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
                     self.place_widgets()
@@ -173,7 +187,7 @@ class SudokuGrid(tk.Frame):
                     self.place_widgets()
             else:
                 self.master.game.puzzle.change_value(self.master.coord.get(),
-                                                     str(self.master.val.get()))
+                                                     str(self.master.val.get()).upper())
                 self.squares[self.master.coord.get()].config(
                     text=str(self.master.game.puzzle.squares[self.master.coord.get()].val))
                 if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
@@ -212,16 +226,16 @@ class SudokuGrid(tk.Frame):
                                      self.master.settings["dimensions"].get()) // int(
                                      self.master.settings["dimensions"].get() ** .5), padx=self.pad, pady=0)
         for i in range(int(self.master.settings["dimensions"].get() ** 0.5 - 1)):
-            print((self.master.settings["dimensions"].get() ** (0.5)) * 2 * (i + 1) + i)
             tk.Label(self, text="_" * 100).grid(
                 row=int((self.master.settings["dimensions"].get() ** (0.5)) * 2 * (i + 1) + i), column=0, columnspan=int(self.master.settings["dimensions"].get()**0.5)+self.master.settings["dimensions"].get())
             tk.Label(self, text="|\n" * 35).grid(row=0, column=int(
                 (self.master.settings["dimensions"].get() ** (0.5)) * (i + 1) + i), rowspan=int(self.master.settings["dimensions"].get()**0.5)+self.master.settings["dimensions"].get()*2)
         tk.Label(self, text="Value:").grid(row=1, column=50)
-        self.val_input.grid(row=0, column=50, rowspan=2)
+        #self.val_input.grid(row=0, column=50, rowspan=2)
         self.submit_button.grid(row=3, column=50)
         self.complete.grid(row=4, column=50)
         self.settings.grid(row=5, column=50)
+        self.timer.grid(row=6, column=50)
 
 
 class SettingsFrame(tk.Frame):

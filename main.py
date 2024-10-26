@@ -138,7 +138,6 @@ class Game:
 
     def load_game(self, mode, arg: str, size=9):
         self.size=size
-        print(mode, arg, size)
         if mode == "user":
             if len(arg) == self.size**2:
                 self.puzzle = Puzzle(arg, self.size)
@@ -148,7 +147,6 @@ class Game:
         elif mode == "load":
             try:
                 user_input = int(arg)
-                print(f"puzzles{size}.txt")
                 with open(f"puzzles{size}.txt", "r") as file:
                     self.puzzle = Puzzle(file.readlines()[user_input], self.size)
                     return True
