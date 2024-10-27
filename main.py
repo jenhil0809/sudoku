@@ -387,6 +387,6 @@ class Game:
 
 if __name__ == "__main__":
     seed(0)
-    game = Game(9)
-    game.load_game("generate", "20", 9)
+    game = Game(4)
+    game.load_game("generate", "8", 16)
     print("".join([cell.val for cell in game.puzzle.squares]))
