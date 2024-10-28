@@ -15,7 +15,7 @@ class GameApp(tk.Tk):
         self.game = main.Game()
         self.frame = LoadGameFrame(self)
         self.new_frame(LoadGameFrame(self))
-        self.settings = {"guess_num": tk.IntVar(value=3),
+        self.settings = {"hint_num": tk.IntVar(value=3),
                          "timer_on": tk.IntVar(),
                          "clashes": tk.IntVar(),
                          "dimensions": tk.IntVar(value=9),
@@ -83,6 +83,7 @@ class SudokuGrid(tk.Frame):
         super().__init__()
         self.master: GameApp = master
         self.solved = False
+        self.hints_left = self.master.settings["hint_num"].get()
         self.start_time = time.time()
         self.timer = tk.Label(self, text=f"{int(time.time() - self.start_time)}")
         for char in self.master.game.puzzle.vals:
@@ -101,12 +102,12 @@ class SudokuGrid(tk.Frame):
                                   command=lambda val=i: self.button_clicked(val + 1000), font='SegoeIU 6') for i in
                         range(self.master.settings["dimensions"].get() ** 2)]
         self.complete = tk.Button(self, text="Complete puzzle", command=self.solve)
+        self.hint_request = tk.Button(self, text=f"Show hint ({self.hints_left} left)", command=self.show_hint)
         for i in range(self.master.settings["dimensions"].get() ** 2):
             if master.game.puzzle.squares[i].val == "0":
                 self.squares[i].config(text=" ")
             else:
                 self.squares[i].config(font='SegoeIU 9 bold')
-        # self.val_input = tk.Scale(self, from_=0, to=9, orient="horizontal", variable=self.master.val)
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
         self.place_widgets()
@@ -115,26 +116,28 @@ class SudokuGrid(tk.Frame):
     def update_timer(self):
         if self.master.settings["timer_on"].get():
             self.timer.config(
-                text=f"Time: {int(time.time() - self.start_time) // 60:02d}:{int(time.time() - self.start_time) % 60:02d}")
+                text=f"Time: {int(time.time() - self.start_time) // 60:02d}:"
+                     f"{int(time.time() - self.start_time) % 60:02d}")
         else:
             self.timer.config(text="")
         tk.Tk.update(self)
-        self.after(1000, self.update_timer)
+        if not self.solved:
+            self.after(1000, self.update_timer)
 
     def create_keyboard_event(self, x):
         keyboard.on_press_key(x, lambda _: self.output(x))
 
     def output(self, x):
-        self.master.val.set(x)
-        self.change_val()
+        if not self.solved:
+            self.master.val.set(x)
+            self.change_val()
 
     def solve(self):
         if not self.solved:
             self.solved = True
             previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
             for cell in self.master.game.puzzle.squares:
-                if not cell.original:
-                    cell.reset()
+                cell.reset()
             self.master.game.puzzle.solve()
             for i in range(len(self.squares)):
                 self.complete.config(text="New puzzle")
@@ -161,7 +164,7 @@ class SudokuGrid(tk.Frame):
             else:
                 self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
                 self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
-        self.highlight_errors()
+            self.highlight_errors()
 
     def highlight(self, val):
         if val != "0" and self.master.settings["highlights"].get():
@@ -214,6 +217,20 @@ class SudokuGrid(tk.Frame):
     def go_to_settings(self):
         self.master.open_settings()
 
+    def show_hint(self):
+        if self.master.coord.get() < 1000 and self.hints_left > 0 and not self.master.game.puzzle.squares[self.master.coord.get()].original:
+            previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
+            self.master.game.puzzle.solve()
+            self.master.val.set([square.val for square in self.master.game.puzzle.squares][self.master.coord.get()])
+            for i in range(len(self.master.game.puzzle.squares)):
+                self.master.game.puzzle.squares[i].set_value(previous_vals[i])
+            self.change_val()
+            self.hints_left -= 1
+            self.hint_request.config(text=f"Show hint ({self.hints_left} left)")
+            for i in range(len(self.master.game.puzzle.squares)):
+                if i != self.master.coord.get():
+                    self.master.game.puzzle.squares[i].set_value(previous_vals[i])
+
     def place_widgets(self):
         for i in range(self.master.settings["dimensions"].get() ** 2):
             self.squares[i].grid(row=i // self.master.settings["dimensions"].get() * 2 + 1 + i // int(
@@ -230,15 +247,15 @@ class SudokuGrid(tk.Frame):
                                      self.master.settings["dimensions"].get() ** .5), padx=self.pad, pady=0)
         for i in range(int(self.master.settings["dimensions"].get() ** 0.5 - 1)):
             tk.Label(self, text="_" * 100).grid(
-                row=int((self.master.settings["dimensions"].get() ** (0.5)) * 2 * (i + 1) + i), column=0,
+                row=int((self.master.settings["dimensions"].get() ** 0.5) * 2 * (i + 1) + i), column=0,
                 columnspan=int(self.master.settings["dimensions"].get() ** 0.5) + self.master.settings[
                     "dimensions"].get())
             tk.Label(self, text="|\n" * 35).grid(row=0, column=int(
-                (self.master.settings["dimensions"].get() ** (0.5)) * (i + 1) + i),
+                (self.master.settings["dimensions"].get() ** 0.5) * (i + 1) + i),
                                                  rowspan=int(self.master.settings["dimensions"].get() ** 0.5) +
                                                          self.master.settings["dimensions"].get() * 2)
-        tk.Label(self, text="Value:").grid(row=1, column=50)
-        # self.val_input.grid(row=0, column=50, rowspan=2)
+
+        self.hint_request.grid(row=2, column=50)
         self.submit_button.grid(row=3, column=50)
         self.complete.grid(row=4, column=50)
         self.settings.grid(row=5, column=50)
@@ -249,7 +266,7 @@ class SettingsFrame(tk.Frame):
     def __init__(self, master: GameApp):
         super().__init__()
         self.master: GameApp = master
-        self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.settings["guess_num"],
+        self.hint_number = tk.Scale(self, from_=0, to=10, variable=self.master.settings["hint_num"],
                                     orient="horizontal")
         self.return_button = tk.Button(self, command=self.return_to_frame, text="Close settings")
         self.timer = tk.Checkbutton(self, variable=self.master.settings["timer_on"])

@@ -3,7 +3,6 @@ from random import choice, randint, seed
 
 class Square:
     """Class for each cell in a sudoku"""
-
     def __init__(self, val: str):
         """
         Parameters
@@ -21,7 +20,6 @@ class Square:
         """
         self.original = False
         self.original_val = "0"
-        self.guesses = []
         if val == "0":
             self.val = "0"
         else:
