@@ -170,6 +170,20 @@ class Puzzle:
         """
         self.squares[square].add_guess(val)
 
+    def add_all_guesses(self):
+        """For every non-original cell in the puzzle, add all values which would not cause a clash
+         to the guesses list"""
+        for cell in self.squares:
+            if not cell.original:
+                for val in self.vals:
+                    cell.add_guess(val)
+        for group in self.groups:
+            for val in self.vals:
+                if val in [cell.val for cell in group.squares]:
+                    for cell in group.squares:
+                        if not cell.original and val in cell.guesses:
+                            cell.guesses.remove(val)
+
     def check_valid(self):
         """
         Check if there are repeated values in any group

@@ -123,6 +123,7 @@ class SudokuGrid(tk.Frame):
         if self.master.settings["dimensions"].get() == 16:
             self.hint_request.config(state="disabled")
             self.complete.config(state="disabled")
+        self.add_all_guesses()
         self.place_widgets()
         self.update_timer()
 
@@ -229,6 +230,7 @@ class SudokuGrid(tk.Frame):
                     self.highlight(str(self.master.val.get()))
                     self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
                     self.place_widgets()
+                self.add_all_guesses()
         self.highlight_errors()
 
     def highlight_errors(self):
@@ -238,6 +240,12 @@ class SudokuGrid(tk.Frame):
         if self.master.settings["clashes"].get():
             for i in self.master.game.puzzle.return_clashes():
                 self.squares[i].config(bg="firebrick1")
+
+    def add_all_guesses(self):
+        if self.master.settings["display_moves"].get():
+            self.master.game.puzzle.add_all_guesses()
+        for i in range(len(self.guesses)):
+            self.guesses[i].config(text="".join(self.master.game.puzzle.squares[i].guesses))
 
     def setting_update(self):
         if self.master.settings['hint_num'].get() > self.hints_taken:
