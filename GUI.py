@@ -124,6 +124,7 @@ class SudokuGrid(tk.Frame):
             self.hint_request.config(state="disabled")
             self.complete.config(state="disabled")
         self.add_all_guesses()
+        self.all_guesses_shown = self.master.settings["display_moves"]
         self.place_widgets()
         self.update_timer()
 
@@ -256,6 +257,9 @@ class SudokuGrid(tk.Frame):
         self.remove_highlights()
         self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
         self.highlight_errors()
+        if self.all_guesses_shown and not self.master.settings['display_moves'].get():
+            for cell in self.master.game.puzzle.squares:
+                cell.guesses = []
         self.change_val()
 
     def show_hint(self):
