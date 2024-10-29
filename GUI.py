@@ -137,8 +137,7 @@ class SudokuGrid(tk.Frame):
         self.start_time = time.time()
         self.timer = tk.Label(self, text=f"{int(time.time() - self.start_time)}")
         for char in self.master.game.puzzle.vals:
-            self.create_keyboard_event(char.lower())
-        self.create_keyboard_event("0")
+            keyboard.on_press_key(char.lower(), lambda _: self.keypress(char.lower()))
         if self.master.settings["dimensions"].get() == 4:
             h, w, self.pad = 4, 10, 5
         elif self.master.settings["dimensions"].get() == 9:
@@ -201,17 +200,7 @@ class SudokuGrid(tk.Frame):
         self.remove_highlights()
         self.highlight_errors()
 
-    def create_keyboard_event(self, x):
-        """
-        Creates a keyboard event that allows the value of self.val to be controlled by key presses
-        Parameters
-        ----------
-        x: str
-            The value that will trigger the response
-        """
-        keyboard.on_press_key(x, lambda _: self.output(x))
-
-    def output(self, x):
+    def keypress(self, x):
         """
         When the "x" key is pressed, self.val is changed
         Parameters
@@ -219,9 +208,12 @@ class SudokuGrid(tk.Frame):
         x: str
             The value to set self.val to
         """
-        if not self.solved:
-            self.val.set(x)
-            self.change_val()
+        try:
+            if not self.solved:
+                self.val.set(x)
+                self.change_val()
+        except tk.TclError:
+            pass
 
     def solve(self):
         """
