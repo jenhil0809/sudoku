@@ -61,11 +61,17 @@ class Square:
         self.original_val = val
         self.original = True
 
-    def reset(self):
+    def reset(self, guesses: bool =False):
         """
-        Set the cell's value to its original value
+        Set the cell's value to its original value and delete all guesses
+        Parameters
+        ----------
+        guesses: bool
+            True if guesses should also be deleted, otherwise False
         """
         self.val = self.original_val
+        if guesses:
+            self.guesses = []
 
 
 class Group:
@@ -194,12 +200,16 @@ class Puzzle:
         """
         return not (False in [group.valid for group in self.groups])
 
-    def reset(self):
+    def reset(self, guesses: bool = False):
         """
         Set the values of all cells in the group back to their original values
+        Parameters
+        -------
+        guesses: bool
+            True if guesses should also be deleted, False otherwise
         """
         for cell in self.squares:
-            cell.reset()
+            cell.reset(guesses)
 
     def num_solutions(self):
         """
