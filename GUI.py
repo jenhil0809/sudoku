@@ -19,7 +19,9 @@ class GameApp(tk.Tk):
                          "timer_on": tk.IntVar(),
                          "clashes": tk.IntVar(),
                          "dimensions": tk.IntVar(value=9),
-                         "highlights": tk.IntVar(), }
+                         "highlights": tk.IntVar(),
+                         "sandwich": tk.IntVar(),
+                         "display_moves": tk.IntVar(), }
         self.setting_frame = SettingsFrame(self)
 
     def new_frame(self, frame):
@@ -50,13 +52,10 @@ class LoadGameFrame(tk.Frame):
         self.generate = tk.Button(self, text="Generate", command=self.generate_game)
         self.user = tk.Button(self, text="User input", command=self.input_game)
         self.load = tk.Button(self, text="Load", command=self.load_game)
-        self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
+        self.settings = tk.Button(self, text="Settings", command=self.master.open_settings)
         self.user_game_input = tk.Entry(self, textvariable=self.user_game)
         self.line_input = tk.Entry(self, textvariable=self.line_number)
         self.place_widgets()
-
-    def go_to_settings(self):
-        self.master.open_settings()
 
     def generate_game(self):
         if self.master.game.load_game("generate", "30", self.master.settings["dimensions"].get()):
@@ -109,16 +108,18 @@ class SudokuGrid(tk.Frame):
                                   command=lambda val=i: self.button_clicked(val + 1000), font='SegoeIU 6') for i in
                         range(self.master.settings["dimensions"].get() ** 2)]
         self.complete = tk.Button(self, text="Complete puzzle", command=self.solve)
-        self.give_up = tk.Button(self, text="Give up and return to menu", command=lambda:self.master.new_frame(LoadGameFrame(self.master)))
+        self.give_up = tk.Button(self, text="Give up and return to menu",
+                                 command=lambda: self.master.new_frame(LoadGameFrame(self.master)))
         self.reset_button = tk.Button(self, text="Reset puzzle", command=self.reset_puzzle)
-        self.hint_request = tk.Button(self, text=f"Show hint ({self.master.settings['hint_num'].get()} left)", command=self.show_hint)
+        self.hint_request = tk.Button(self, text=f"Show hint ({self.master.settings['hint_num'].get()} left)",
+                                      command=self.show_hint)
         for i in range(self.master.settings["dimensions"].get() ** 2):
             if master.game.puzzle.squares[i].val == "0":
                 self.squares[i].config(text=" ")
             else:
                 self.squares[i].config(font='SegoeIU 9 bold')
         self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
-        self.settings = tk.Button(self, text="Settings", command=self.go_to_settings)
+        self.settings = tk.Button(self, text="Settings", command=self.master.open_settings)
         if self.master.settings["dimensions"].get() == 16:
             self.hint_request.config(state="disabled")
             self.complete.config(state="disabled")
@@ -238,12 +239,10 @@ class SudokuGrid(tk.Frame):
             for i in self.master.game.puzzle.return_clashes():
                 self.squares[i].config(bg="firebrick1")
 
-    def go_to_settings(self):
-        self.master.open_settings()
-
     def setting_update(self):
         if self.master.settings['hint_num'].get() > self.hints_taken:
-            self.hint_request.config(text=f"Show hint ({self.master.settings['hint_num'].get() - self.hints_taken} left)")
+            self.hint_request.config(
+                text=f"Show hint ({self.master.settings['hint_num'].get() - self.hints_taken} left)")
         else:
             self.hint_request.config(text="Show hint (0 left)")
         self.remove_highlights()
@@ -252,8 +251,8 @@ class SudokuGrid(tk.Frame):
         self.change_val()
 
     def show_hint(self):
-        if self.master.coord.get() < 1000 and self.hints_taken < self.master.settings["hint_num"].get() and not self.master.game.puzzle.squares[
-            self.master.coord.get()].original:
+        if self.master.coord.get() < 1000 and self.hints_taken < self.master.settings["hint_num"].get() and not \
+                self.master.game.puzzle.squares[self.master.coord.get()].original:
             previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
             self.master.game.puzzle.reset()
             self.master.game.puzzle.solve()
@@ -262,7 +261,8 @@ class SudokuGrid(tk.Frame):
                 self.master.game.puzzle.squares[i].set_value(previous_vals[i])
             self.change_val()
             self.hints_taken += 1
-            self.hint_request.config(text=f"Show hint ({self.master.settings['hint_num'].get()-self.hints_taken} left)")
+            self.hint_request.config(
+                text=f"Show hint ({self.master.settings['hint_num'].get() - self.hints_taken} left)")
             for i in range(len(self.master.game.puzzle.squares)):
                 if i != self.master.coord.get():
                     self.master.game.puzzle.squares[i].set_value(previous_vals[i])
@@ -310,7 +310,7 @@ class SettingsFrame(tk.Frame):
         self.timer = tk.Checkbutton(self, variable=self.master.settings["timer_on"])
         self.timer.select()
         # Time limit
-        self.sandwich = tk.Checkbutton(self)
+        self.sandwich = tk.Checkbutton(self, variable=self.master.settings["sandwich"])
         self.dimensions = [
             (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.settings["dimensions"]))
             for i in
@@ -319,7 +319,7 @@ class SettingsFrame(tk.Frame):
         self.clash_highlight.select()
         self.hints_highlight = tk.Checkbutton(self, variable=self.master.settings["highlights"])
         self.hints_highlight.select()
-        self.display_moves = tk.Checkbutton(self)
+        self.display_moves = tk.Checkbutton(self, variable=self.master.settings["display_moves"])
         self.place_widgets()
 
     def return_to_frame(self):
