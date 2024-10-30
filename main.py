@@ -315,11 +315,13 @@ class Game:
         ----------
         mode: str
             "user" if a user inputed puzzle should be loaded
-            "load" if a puzzle should be loaded from a file
+            "load" if a specific puzzle should be loaded from a file
+            "load_random" if a random puzzle should be loaded from a file
             "generate" if a new puzzle should be created
         arg: str
             if mode == "user", a string containing the values of the sudoku
             if mode == "load", the index of the puzzle in the list
+            if mode == "load_random", the difficulty of the sudoku
             if mode == "generate", the number of blank cells
         size: int
             the size of the sudoku to be created
@@ -345,6 +347,28 @@ class Game:
                     return True
             except IndexError:
                 return False
+
+        elif mode == "load_random":
+            if size == 9:
+                with open("puzzles9.txt", "r") as file:
+                    lines = [line.strip() for line in file]
+                if arg.lower() == "easy":
+                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if puzzle.count("0") < 30]), self.size)
+                    return True
+                elif arg.lower() == "medium":
+                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 30 <= puzzle.count("0") < 42]), self.size)
+                    return True
+                elif arg.lower() == "hard":
+                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 42 <= puzzle.count("0")]), self.size)
+                    return True
+                else:
+                    return False
+            else:
+                with open(f"puzzles{size}.txt", "r") as file:
+                    lines = [line.strip() for line in file]
+                self.puzzle = Puzzle(choice(lines), self.size)
+                return True
+
 
         elif mode == "generate":
             while not self.generate_puzzle(int(arg)):

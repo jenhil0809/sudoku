@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 
 with open("puzzles9.txt", "r") as file:
     lines = [line.strip() for line in file]
-print(len([puzzle for puzzle in lines if 40 <= puzzle.count("0") <= 51]))
-print(len([puzzle for puzzle in lines if 30 <= puzzle.count("0") < 40]))
+print(len([puzzle for puzzle in lines if 43 <= puzzle.count("0") <= 51]))
+print(len([puzzle for puzzle in lines if 30 <= puzzle.count("0") < 43]))
 print(len([puzzle for puzzle in lines if puzzle.count("0") < 30]))
 print("______")
 

@@ -6,6 +6,7 @@ import time
 
 class GameApp(tk.Tk):
     """Holds the frames to be displayed and settings"""
+
     def __init__(self):
         super().__init__()
         self.title("Sudoku")
@@ -56,6 +57,7 @@ class GameApp(tk.Tk):
 
 class LoadGameFrame(tk.Frame):
     """Allows the user to load a game"""
+
     def __init__(self, master: GameApp):
         """
         Parameters
@@ -76,6 +78,7 @@ class LoadGameFrame(tk.Frame):
         self.generate = tk.Button(self, text="Generate", command=self.generate_game)
         self.user = tk.Button(self, text="User input", command=self.input_game)
         self.load = tk.Button(self, text="Load", command=self.load_game)
+        self.load_any = tk.Button(self, text="Load random", command=self.load_random)
         self.settings = tk.Button(self, text="Settings", command=self.master.open_settings)
         self.user_game_input = tk.Entry(self, textvariable=self.user_game)
         self.line_input = tk.Entry(self, textvariable=self.line_number)
@@ -96,6 +99,12 @@ class LoadGameFrame(tk.Frame):
         if self.master.game.load_game("load", self.line_number.get(), self.master.settings["dimensions"].get()):
             self.master.new_frame(SudokuGrid(self.master))
 
+    def load_random(self):
+        """Load a random game from memory with a given difficulty level"""
+        if self.master.game.load_game("load_random", self.master.settings["difficulty"].get(),
+                                      self.master.settings["dimensions"].get()):
+            self.master.new_frame(SudokuGrid(self.master))
+
     def place_widgets(self):
         """Places the required widgets on the screen"""
         self.generate.grid(row=0, column=0, columnspan=2)
@@ -103,7 +112,8 @@ class LoadGameFrame(tk.Frame):
         self.user_game_input.grid(row=1, column=1)
         self.load.grid(row=2, column=0)
         self.line_input.grid(row=2, column=1)
-        self.settings.grid(row=3, column=0)
+        self.load_any.grid(row=3, column=0)
+        self.settings.grid(row=4, column=0)
 
     def setting_update(self):
         """If the dimensions of the puzzle are 16x16, a puzzle cannot be generated, so this option should be disabled"""
@@ -115,6 +125,7 @@ class LoadGameFrame(tk.Frame):
 
 class SudokuGrid(tk.Frame):
     """Displays the sudoku puzzle"""
+
     def __init__(self, master: GameApp):
         """
         Parameters
@@ -182,19 +193,20 @@ class SudokuGrid(tk.Frame):
         """
         if self.master.settings["timer_on"].get() and self.master.settings["limit_on"].get():
             self.timer.config(text=f"Time: {int(time.time() - self.start_time) // 60:02d}:"
-                        f"{int(time.time() - self.start_time) % 60:02d} / "
-                        f"{int((self.master.settings['time_limit'].get()*60)) // 60:02d}:"
-                        f"{int((self.master.settings['time_limit'].get()*60)) % 60:02d}")
+                                   f"{int(time.time() - self.start_time) % 60:02d} / "
+                                   f"{int((self.master.settings['time_limit'].get() * 60)) // 60:02d}:"
+                                   f"{int((self.master.settings['time_limit'].get() * 60)) % 60:02d}")
         elif self.master.settings["timer_on"].get() and not self.master.settings["limit_on"].get():
             self.timer.config(text=f"Time: {int(time.time() - self.start_time) // 60:02d}:"
-                     f"{int(time.time() - self.start_time) % 60:02d}")
+                                   f"{int(time.time() - self.start_time) % 60:02d}")
         else:
             self.timer.config(text="")
         tk.Tk.update(self)
         if not self.solved:
-           if self.master.settings["limit_on"].get() and self.master.settings["time_limit"].get()*60 <= int(time.time() - self.start_time):
+            if self.master.settings["limit_on"].get() and self.master.settings["time_limit"].get() * 60 <= int(
+                    time.time() - self.start_time):
                 self.solve()
-           else:
+            else:
                 self.after(1000, self.update_timer)
 
     def reset_puzzle(self):
@@ -416,6 +428,7 @@ class SudokuGrid(tk.Frame):
 
 class SettingsFrame(tk.Frame):
     """The frame that displays the settings selected"""
+
     def __init__(self, master: GameApp):
         """
         Parameters
@@ -441,7 +454,8 @@ class SettingsFrame(tk.Frame):
         self.timer.select()
         # Time limit
         self.limit_on = tk.Checkbutton(self, variable=self.master.settings["limit_on"])
-        self.time_limit = tk.Spinbox(self, from_=0.5, to=30, increment=0.5, textvariable=self.master.settings["time_limit"])
+        self.time_limit = tk.Spinbox(self, from_=0.5, to=30, increment=0.5,
+                                     textvariable=self.master.settings["time_limit"])
         self.sandwich = tk.Checkbutton(self, variable=self.master.settings["sandwich"])
         self.dimensions = [
             (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.settings["dimensions"]))
@@ -479,8 +493,8 @@ class SettingsFrame(tk.Frame):
             self.dimensions[i].grid(row=7, column=i)
         tk.Label(self, text="Difficulty level").grid(row=8, column=0)
         for i in range(3):
-            self.difficulty[i].grid(row=8, column=i)
-        self.return_button.grid(row=9, column=0)
+            self.difficulty[i].grid(row=9, column=i)
+        self.return_button.grid(row=10, column=0)
 
 
 if __name__ == "__main__":

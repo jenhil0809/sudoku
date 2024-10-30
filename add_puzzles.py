@@ -3,8 +3,9 @@ from random import randint
 
 game = main.Game()
 puzzles = []
-for i in range(10):
-    x = randint(40, 45)
+for i in range(5):
+    x = randint(50, 55)
+    print(x)
     game.load_game("generate", str(x), 9)
     puzzle = "".join([cell.val for cell in game.puzzle.squares])
     puzzles.append(puzzle)
