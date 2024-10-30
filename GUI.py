@@ -21,7 +21,10 @@ class GameApp(tk.Tk):
                          "dimensions": tk.IntVar(value=9),
                          "highlights": tk.IntVar(),
                          "sandwich": tk.IntVar(),
-                         "display_moves": tk.IntVar(), }
+                         "display_moves": tk.IntVar(),
+                         "difficulty": tk.StringVar(value="Medium"),
+                         "time_limit": tk.DoubleVar(value=5),
+                         "limit_on": tk.IntVar()}
         self.setting_frame = SettingsFrame(self)
 
     def new_frame(self, frame):
@@ -137,7 +140,8 @@ class SudokuGrid(tk.Frame):
         self.start_time = time.time()
         self.timer = tk.Label(self, text=f"{int(time.time() - self.start_time)}")
         for char in self.master.game.puzzle.vals:
-            keyboard.on_press_key(char.lower(), lambda _: self.keypress(char.lower()))
+            self.create_keyboard_event(char.lower())
+        self.create_keyboard_event("0")
         if self.master.settings["dimensions"].get() == 4:
             h, w, self.pad = 4, 10, 5
         elif self.master.settings["dimensions"].get() == 9:
@@ -176,15 +180,22 @@ class SudokuGrid(tk.Frame):
         Changes the text displayed by the self.timer object to the difference between the current time and the starting
         time every second after being called while the puzzle is not completed
         """
-        if self.master.settings["timer_on"].get():
-            self.timer.config(
-                text=f"Time: {int(time.time() - self.start_time) // 60:02d}:"
+        if self.master.settings["timer_on"].get() and self.master.settings["limit_on"].get():
+            self.timer.config(text=f"Time: {int(time.time() - self.start_time) // 60:02d}:"
+                        f"{int(time.time() - self.start_time) % 60:02d} / "
+                        f"{int((self.master.settings['time_limit'].get()*60)) // 60:02d}:"
+                        f"{int((self.master.settings['time_limit'].get()*60)) % 60:02d}")
+        elif self.master.settings["timer_on"].get() and not self.master.settings["limit_on"].get():
+            self.timer.config(text=f"Time: {int(time.time() - self.start_time) // 60:02d}:"
                      f"{int(time.time() - self.start_time) % 60:02d}")
         else:
             self.timer.config(text="")
         tk.Tk.update(self)
         if not self.solved:
-            self.after(1000, self.update_timer)
+           if self.master.settings["limit_on"].get() and self.master.settings["time_limit"].get()*60 <= int(time.time() - self.start_time):
+                self.solve()
+           else:
+                self.after(1000, self.update_timer)
 
     def reset_puzzle(self):
         """Resets any guesses, highlights, cell values entered, the timer and hint number"""
@@ -199,6 +210,16 @@ class SudokuGrid(tk.Frame):
                 self.squares[i].config(text=" ")
         self.remove_highlights()
         self.highlight_errors()
+
+    def create_keyboard_event(self, x):
+        """
+        Creates a keyboard event that allows the value of self.val to be controlled by key presses
+        Parameters
+        ----------
+        x: str
+            The value that will trigger the response
+        """
+        keyboard.on_press_key(x, lambda _: self.keypress(x))
 
     def keypress(self, x):
         """
@@ -419,11 +440,17 @@ class SettingsFrame(tk.Frame):
         self.timer = tk.Checkbutton(self, variable=self.master.settings["timer_on"])
         self.timer.select()
         # Time limit
+        self.limit_on = tk.Checkbutton(self, variable=self.master.settings["limit_on"])
+        self.time_limit = tk.Spinbox(self, from_=0.5, to=30, increment=0.5, textvariable=self.master.settings["time_limit"])
         self.sandwich = tk.Checkbutton(self, variable=self.master.settings["sandwich"])
         self.dimensions = [
             (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.settings["dimensions"]))
             for i in
             range(2, 5)]
+        difficulties = ["Easy", "Medium", "Hard"]
+        self.difficulty = [
+            (tk.Radiobutton(self, text=f"{difficulties[i]}", value=difficulties[i],
+                            variable=self.master.settings["difficulty"])) for i in range(3)]
         self.clash_highlight = tk.Checkbutton(self, variable=self.master.settings["clashes"])
         self.clash_highlight.select()
         self.hints_highlight = tk.Checkbutton(self, variable=self.master.settings["highlights"])
@@ -437,17 +464,23 @@ class SettingsFrame(tk.Frame):
         self.hint_number.grid(row=0, column=1)
         tk.Label(self, text="Display timer").grid(row=1, column=0)
         self.timer.grid(row=1, column=1)
-        tk.Label(self, text="Sandwich sudoku").grid(row=2, column=0)
-        self.sandwich.grid(row=2, column=1)
-        tk.Label(self, text="Highlight clashes").grid(row=3, column=0)
-        self.clash_highlight.grid(row=3, column=1)
-        tk.Label(self, text="Highlight hints").grid(row=4, column=0)
-        self.hints_highlight.grid(row=4, column=1)
-        tk.Label(self, text="Display moves").grid(row=5, column=0)
-        self.display_moves.grid(row=5, column=1)
+        tk.Label(self, text="Time limit").grid(row=2, column=0)
+        self.limit_on.grid(row=2, column=1)
+        self.time_limit.grid(row=2, column=2)
+        tk.Label(self, text="Sandwich sudoku").grid(row=3, column=0)
+        self.sandwich.grid(row=3, column=1)
+        tk.Label(self, text="Highlight clashes").grid(row=4, column=0)
+        self.clash_highlight.grid(row=4, column=1)
+        tk.Label(self, text="Highlight hints").grid(row=5, column=0)
+        self.hints_highlight.grid(row=5, column=1)
+        tk.Label(self, text="Display moves").grid(row=6, column=0)
+        self.display_moves.grid(row=6, column=1)
         for i in range(3):
-            self.dimensions[i].grid(row=6, column=i)
-        self.return_button.grid(row=7, column=0)
+            self.dimensions[i].grid(row=7, column=i)
+        tk.Label(self, text="Difficulty level").grid(row=8, column=0)
+        for i in range(3):
+            self.difficulty[i].grid(row=8, column=i)
+        self.return_button.grid(row=9, column=0)
 
 
 if __name__ == "__main__":
