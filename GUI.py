@@ -430,10 +430,10 @@ class SudokuGrid(tk.Frame):
 
         self.timer.grid(row=1, column=50)
         self.hint_request.grid(row=2, column=50)
-        self.complete.grid(row=4, column=50)
-        self.settings.grid(row=5, column=50)
-        self.give_up.grid(row=6, column=50)
-        self.reset_button.grid(row=7, column=50)
+        self.complete.grid(row=3, column=50)
+        self.give_up.grid(row=4, column=50)
+        self.reset_button.grid(row=5, column=50)
+        self.settings.grid(row=6, column=50)
 
 
 class SettingsFrame(tk.Frame):
