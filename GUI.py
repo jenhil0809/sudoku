@@ -2,6 +2,7 @@ import main
 import tkinter as tk
 import keyboard
 import time
+from random import randint
 
 
 class GameApp(tk.Tk):
@@ -12,10 +13,7 @@ class GameApp(tk.Tk):
         self.title("Sudoku")
         self.geometry("700x600")
         self.coord = tk.IntVar()
-        self.show_highlights = tk.IntVar()
         self.game = main.Game()
-        self.frame = LoadGameFrame(self)
-        self.new_frame(LoadGameFrame(self))
         self.settings = {"hint_num": tk.IntVar(value=3),
                          "timer_on": tk.IntVar(),
                          "clashes": tk.IntVar(),
@@ -26,6 +24,8 @@ class GameApp(tk.Tk):
                          "difficulty": tk.StringVar(value="Medium"),
                          "time_limit": tk.DoubleVar(value=5),
                          "limit_on": tk.IntVar()}
+        self.frame = LoadGameFrame(self)
+        self.new_frame(LoadGameFrame(self))
         self.setting_frame = SettingsFrame(self)
 
     def new_frame(self, frame):
@@ -82,12 +82,21 @@ class LoadGameFrame(tk.Frame):
         self.settings = tk.Button(self, text="Settings", command=self.master.open_settings)
         self.user_game_input = tk.Entry(self, textvariable=self.user_game)
         self.line_input = tk.Entry(self, textvariable=self.line_number)
+        self.setting_update()
         self.place_widgets()
 
     def generate_game(self):
         """Generates a new puzzle"""
-        if self.master.game.load_game("generate", "30", self.master.settings["dimensions"].get()):
-            self.master.new_frame(SudokuGrid(self.master))
+        if self.master.settings["dimensions"].get() == 4:
+            if self.master.game.load_game("generate", str(randint(2, 5)), 4):
+                self.master.new_frame(SudokuGrid(self.master))
+        elif self.master.settings["dimensions"].get() == 9:
+            if self.master.settings["difficulty"].get() == "Easy":
+                if self.master.game.load_game("generate", str(randint(15, 29)), 9):
+                    self.master.new_frame(SudokuGrid(self.master))
+            elif self.master.settings["difficulty"].get() == "Medium":
+                if self.master.game.load_game("generate", str(randint(30, 41)), 9):
+                    self.master.new_frame(SudokuGrid(self.master))
 
     def input_game(self):
         """Loads a user inputted game"""
@@ -116,8 +125,9 @@ class LoadGameFrame(tk.Frame):
         self.settings.grid(row=4, column=0)
 
     def setting_update(self):
-        """If the dimensions of the puzzle are 16x16, a puzzle cannot be generated, so this option should be disabled"""
-        if self.master.settings["dimensions"].get() == 16:
+        """If the dimensions of the puzzle are 16x16 or the difficulty level is hard, a puzzle cannot be generated,
+        so this option should be disabled"""
+        if self.master.settings["dimensions"].get() == 16 or self.master.settings["difficulty"].get() == "Hard":
             self.generate.config(state="disabled")
         else:
             self.generate.config(state="normal")
@@ -176,7 +186,6 @@ class SudokuGrid(tk.Frame):
                 self.squares[i].config(text=" ")
             else:
                 self.squares[i].config(font='SegoeIU 9 bold')
-        self.submit_button = tk.Button(self, text="Submit", command=self.change_val)
         self.settings = tk.Button(self, text="Settings", command=self.master.open_settings)
         if self.master.settings["dimensions"].get() == 16:
             self.hint_request.config(state="disabled")
@@ -213,6 +222,7 @@ class SudokuGrid(tk.Frame):
         """Resets any guesses, highlights, cell values entered, the timer and hint number"""
         self.master.game.puzzle.reset(True)
         self.hints_taken = 0
+        self.solved = False
         self.hint_request.config(text=f"Show hint ({self.master.settings['hint_num'].get()} left)")
         self.start_time = time.time()
         for i in range(len(self.squares)):
@@ -259,7 +269,6 @@ class SudokuGrid(tk.Frame):
                 cell.reset()
             self.master.game.puzzle.solve()
             for i in range(len(self.squares)):
-                self.complete.config(text="New puzzle")
                 self.guesses[i].config(bg="light grey")
                 if self.master.game.puzzle.squares[i].original:
                     self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="light grey")
@@ -372,6 +381,8 @@ class SudokuGrid(tk.Frame):
         if self.all_guesses_shown and not self.master.settings['display_moves'].get():
             for cell in self.master.game.puzzle.squares:
                 cell.guesses = []
+        else:
+            self.add_all_guesses()
 
     def show_hint(self):
         """If the cell is not one of the original cells, reveals the value that should be held by that cell and
@@ -419,7 +430,6 @@ class SudokuGrid(tk.Frame):
 
         self.timer.grid(row=1, column=50)
         self.hint_request.grid(row=2, column=50)
-        self.submit_button.grid(row=3, column=50)
         self.complete.grid(row=4, column=50)
         self.settings.grid(row=5, column=50)
         self.give_up.grid(row=6, column=50)
