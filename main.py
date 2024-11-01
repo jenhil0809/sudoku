@@ -3,6 +3,7 @@ from random import choice, randint, seed
 
 class Square:
     """Class for each cell in a sudoku"""
+
     def __init__(self, val: str):
         """
         Parameters
@@ -61,7 +62,7 @@ class Square:
         self.original_val = val
         self.original = True
 
-    def reset(self, guesses: bool =False):
+    def reset(self, guesses: bool = False):
         """
         Set the cell's value to its original value and delete all guesses
         Parameters
@@ -277,6 +278,33 @@ class Puzzle:
         else:
             return False
 
+    def sandwich(self):
+        """
+        Finds the sum of values between 1 and 9 for every row and column
+        Returns
+        -------
+        (list, list)
+            First list for rows, second for columns
+        """
+        cols = []
+        rows = []
+        vals = [square.val for square in self.squares]
+        self.solve()
+        for i in range(9):
+            row = [int(self.squares[9*i+n].val) for n in range(9)]
+            if row.index(9) > row.index(1):
+                rows.append(sum(row[row.index(1)+1:row.index(9)]))
+            else:
+                rows.append(sum(row[row.index(9)+1:row.index(1)]))
+            col = [int(self.squares[i+9*n].val) for n in range(9)]
+            if col.index(9) > col.index(1):
+                cols.append(sum(col[col.index(1)+1:col.index(9)]))
+            else:
+                cols.append(sum(col[col.index(9)+1:col.index(1)]))
+        for i in range(len(self.squares)):
+            self.squares[i].val = vals[i]
+        return rows, cols
+
 
 class Game:
     def __init__(self, size: int = 9):
@@ -356,7 +384,8 @@ class Game:
                     self.puzzle = Puzzle(choice([puzzle for puzzle in lines if puzzle.count("0") < 30]), self.size)
                     return True
                 elif arg.lower() == "medium":
-                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 30 <= puzzle.count("0") < 42]), self.size)
+                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 30 <= puzzle.count("0") < 42]),
+                                         self.size)
                     return True
                 elif arg.lower() == "hard":
                     self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 42 <= puzzle.count("0")]), self.size)

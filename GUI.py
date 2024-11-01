@@ -192,6 +192,7 @@ class SudokuGrid(tk.Frame):
             self.complete.config(state="disabled")
         self.add_all_guesses()
         self.all_guesses_shown = self.master.settings["display_moves"]
+        self.sandwich = False
         self.place_widgets()
         self.update_timer()
 
@@ -383,6 +384,10 @@ class SudokuGrid(tk.Frame):
                 cell.guesses = []
         else:
             self.add_all_guesses()
+        if self.master.settings["sandwich"].get() and len(self.squares) == 81:
+            self.add_sandwich()
+        elif not self.master.settings["sandwich"].get() and self.sandwich:
+            self.remove_sandwich()
 
     def show_hint(self):
         """If the cell is not one of the original cells, reveals the value that should be held by that cell and
@@ -402,6 +407,19 @@ class SudokuGrid(tk.Frame):
             for i in range(len(self.master.game.puzzle.squares)):
                 if i != self.master.coord.get():
                     self.master.game.puzzle.squares[i].set_value(previous_vals[i])
+
+    def add_sandwich(self):
+        self.sandwich = True
+        sandwich = self.master.game.puzzle.sandwich()
+        for i in range(9):
+            tk.Label(self, text=str(sandwich[0][i])).grid(row=2*i+i//3+1, column=12)
+            tk.Label(self, text=str(sandwich[1][i])).grid(row=20, column=i+i//3)
+
+    def remove_sandwich(self):
+        self.sandwich = False
+        for i in range(9):
+            tk.Label(self, text="   ").grid(row=2*i+i//3+1, column=12)
+            tk.Label(self, text="   ").grid(row=20, column=i+i//3)
 
     def place_widgets(self):
         """Places the required widgets on the screen"""
@@ -427,7 +445,8 @@ class SudokuGrid(tk.Frame):
                 (self.master.settings["dimensions"].get() ** 0.5) * (i + 1) + i),
                                                  rowspan=int(self.master.settings["dimensions"].get() ** 0.5) +
                                                          self.master.settings["dimensions"].get() * 2)
-
+        if self.master.settings["sandwich"].get() and len(self.squares) == 81:
+            self.add_sandwich()
         self.timer.grid(row=1, column=50)
         self.hint_request.grid(row=2, column=50)
         self.complete.grid(row=3, column=50)
