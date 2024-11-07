@@ -223,7 +223,6 @@ class SudokuGrid(tk.Frame):
         """Resets any guesses, highlights, cell values entered, the timer and hint number"""
         self.master.game.puzzle.reset(True)
         self.hints_taken = 0
-        self.solved = False
         self.hint_request.config(text=f"Show hint ({self.master.settings['hint_num'].get()} left)")
         self.start_time = time.time()
         for i in range(len(self.squares)):
@@ -231,8 +230,10 @@ class SudokuGrid(tk.Frame):
             self.squares[i].config(text=self.master.game.puzzle.squares[i].val)
             if self.master.game.puzzle.squares[i].val == "0":
                 self.squares[i].config(text=" ")
+        self.solved = False
         self.remove_highlights()
         self.highlight_errors()
+        self.update_timer()
 
     def create_keyboard_event(self, x):
         """
