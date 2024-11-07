@@ -173,7 +173,7 @@ class SudokuGrid(tk.Frame):
                                   command=lambda val=i: self.button_clicked(val)) for i in
                         range(self.master.settings["dimensions"].get() ** 2)]
         self.guesses = [tk.Button(self, text=" ", height=1, width=w, bg="light grey",
-                                  command=lambda val=i: self.button_clicked(val + 1000), font='SegoeIU 6') for i in
+                                  command=lambda val=i: self.button_clicked(val + 1000), font="SegoeIU 6", fg="gray23") for i in
                         range(self.master.settings["dimensions"].get() ** 2)]
         self.complete = tk.Button(self, text="Complete puzzle", command=self.solve)
         self.give_up = tk.Button(self, text="Return to menu",
@@ -339,7 +339,7 @@ class SudokuGrid(tk.Frame):
                 self.master.game.puzzle.change_value(self.master.coord.get(),
                                                      str(self.val.get()).upper())
                 self.squares[self.master.coord.get()].config(
-                    text=str(self.master.game.puzzle.squares[self.master.coord.get()].val))
+                    text=str(self.master.game.puzzle.squares[self.master.coord.get()].val), fg="gray15")
                 if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
                     self.squares[self.master.coord.get()].config(text=" ")
                 if self.master.game.puzzle.completed:
@@ -355,7 +355,7 @@ class SudokuGrid(tk.Frame):
     def highlight_errors(self):
         """Any clashing cells are highlighted in red"""
         for square in self.squares:
-            if square["bg"] == "firebrick1":
+            if square["bg"] in ["firebrick1", "palegreen"]:
                 square.config(bg="light grey")
         if self.master.settings["clashes"].get():
             for i in self.master.game.puzzle.return_clashes():
@@ -413,14 +413,14 @@ class SudokuGrid(tk.Frame):
         self.sandwich = True
         sandwich = self.master.game.puzzle.sandwich()
         for i in range(9):
-            tk.Label(self, text=str(sandwich[0][i])).grid(row=2*i+i//3+1, column=12)
-            tk.Label(self, text=str(sandwich[1][i])).grid(row=20, column=i+i//3)
+            tk.Label(self, text=str(sandwich[0][i])).grid(row=2 * i + i // 3 + 1, column=12)
+            tk.Label(self, text=str(sandwich[1][i])).grid(row=20, column=i + i // 3)
 
     def remove_sandwich(self):
         self.sandwich = False
         for i in range(9):
-            tk.Label(self, text="   ").grid(row=2*i+i//3+1, column=12)
-            tk.Label(self, text="   ").grid(row=20, column=i+i//3)
+            tk.Label(self, text="   ").grid(row=2 * i + i // 3 + 1, column=12)
+            tk.Label(self, text="   ").grid(row=20, column=i + i // 3)
 
     def place_widgets(self):
         """Places the required widgets on the screen"""
