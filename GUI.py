@@ -372,23 +372,24 @@ class SudokuGrid(tk.Frame):
     def setting_update(self):
         """Respond to any changes in the settings by changing the hint number, adding/removing highlights and changing
          guesses"""
-        if self.master.settings['hint_num'].get() > self.hints_taken:
-            self.hint_request.config(
-                text=f"Show hint ({self.master.settings['hint_num'].get() - self.hints_taken} left)")
-        else:
-            self.hint_request.config(text="Show hint (0 left)")
-        self.remove_highlights()
-        self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
-        self.highlight_errors()
-        if self.all_guesses_shown and not self.master.settings['display_moves'].get():
-            for cell in self.master.game.puzzle.squares:
-                cell.guesses = []
-        else:
-            self.add_all_guesses()
-        if self.master.settings["sandwich"].get() and len(self.squares) == 81:
-            self.add_sandwich()
-        elif not self.master.settings["sandwich"].get() and self.sandwich:
-            self.remove_sandwich()
+        if not self.solved:
+            if self.master.settings['hint_num'].get() > self.hints_taken:
+                self.hint_request.config(
+                    text=f"Show hint ({self.master.settings['hint_num'].get() - self.hints_taken} left)")
+            else:
+                self.hint_request.config(text="Show hint (0 left)")
+            self.remove_highlights()
+            self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
+            self.highlight_errors()
+            if self.all_guesses_shown and not self.master.settings['display_moves'].get():
+                for cell in self.master.game.puzzle.squares:
+                    cell.guesses = []
+            else:
+                self.add_all_guesses()
+            if self.master.settings["sandwich"].get() and len(self.squares) == 81:
+                self.add_sandwich()
+            elif not self.master.settings["sandwich"].get() and self.sandwich:
+                self.remove_sandwich()
 
     def show_hint(self):
         """If the cell is not one of the original cells, reveals the value that should be held by that cell and
