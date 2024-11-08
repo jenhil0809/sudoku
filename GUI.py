@@ -11,7 +11,7 @@ class GameApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Sudoku")
-        self.geometry("700x600")
+        self.geometry(f"700x800")
         self.coord = tk.IntVar()
         self.game = main.Game()
         self.settings = {"hint_num": tk.IntVar(value=3),
