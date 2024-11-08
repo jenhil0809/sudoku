@@ -350,7 +350,8 @@ class SudokuGrid(tk.Frame):
                     self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
                     self.place_widgets()
                 self.add_all_guesses()
-        self.highlight_errors()
+        if not self.solved:
+            self.highlight_errors()
 
     def highlight_errors(self):
         """Any clashing cells are highlighted in red"""
