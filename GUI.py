@@ -311,7 +311,7 @@ class SudokuGrid(tk.Frame):
         """
         if val != "0" and self.master.settings["highlights"].get():
             for i in range(len(self.squares)):
-                if self.master.game.puzzle.squares[i].val == val:
+                if self.master.game.puzzle.squares[i].val == val.upper():
                     self.squares[i].config(bg="lightblue1")
         self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
 
