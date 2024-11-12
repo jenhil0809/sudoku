@@ -177,7 +177,8 @@ class SudokuGrid(tk.Frame):
                                   command=lambda val=i: self.button_clicked(val)) for i in
                         range(self.master.settings["dimensions"].get() ** 2)]
         self.guesses = [tk.Button(self, text=" ", height=1, width=w, bg="light grey",
-                                  command=lambda val=i: self.button_clicked(val + 1000), font="SegoeIU 6", fg="gray23") for i in
+                                  command=lambda val=i: self.button_clicked(val + 1000), font="SegoeIU 6", fg="gray23")
+                        for i in
                         range(self.master.settings["dimensions"].get() ** 2)]
         self.complete = tk.Button(self, text="Complete puzzle", command=self.solve)
         self.give_up = tk.Button(self, text="Return to menu",
@@ -531,7 +532,7 @@ class SettingsFrame(tk.Frame):
         for i in range(3):
             self.difficulty[i].grid(row=9, column=i)
         self.return_button.grid(row=10, column=0)
-        tk.Label(self, text= """Hint number: the maximum number of hints the user can be given\n
+        tk.Label(self, text="""Hint number: the maximum number of hints the user can be given\n
         Time limit: number of minutes\n
         Sandwich sudoku: sum of values between 1 and 9 displayed (9x9 only)\n
         Highlight clashes: clashing cells highlighted in red\n
