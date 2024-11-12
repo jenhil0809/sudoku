@@ -291,19 +291,28 @@ class Puzzle:
         vals = [square.val for square in self.squares]
         self.solve()
         for i in range(9):
-            row = [int(self.squares[9*i+n].val) for n in range(9)]
-            if row.index(9) > row.index(1):
-                rows.append(sum(row[row.index(1)+1:row.index(9)]))
-            else:
-                rows.append(sum(row[row.index(9)+1:row.index(1)]))
-            col = [int(self.squares[i+9*n].val) for n in range(9)]
-            if col.index(9) > col.index(1):
-                cols.append(sum(col[col.index(1)+1:col.index(9)]))
-            else:
-                cols.append(sum(col[col.index(9)+1:col.index(1)]))
+            rows.append(self.sandwich_sums(i, True))
+            cols.append(self.sandwich_sums(i, False))
         for i in range(len(self.squares)):
             self.squares[i].val = vals[i]
         return rows, cols
+
+    def sandwich_sums(self, i, is_row=True):
+        """Find the sum of values between 1 and 9 for a row/column
+        Parameters
+        -------
+        i: int
+            The row/column number
+        is_row: bool
+            Default True. True if a row, False if a column."""
+        if is_row:
+            line = [int(self.squares[9 * i + n].val) for n in range(9)]
+        else:
+            line = [int(self.squares[i + 9 * n].val) for n in range(9)]
+        if line.index(9) > line.index(1):
+            return sum(line[line.index(1) + 1:line.index(9)])
+        else:
+            return sum(line[line.index(9) + 1:line.index(1)])
 
 
 class Game:
@@ -397,7 +406,6 @@ class Game:
                     lines = [line.strip() for line in file]
                 self.puzzle = Puzzle(choice(lines), self.size)
                 return True
-
 
         elif mode == "generate":
             while not self.generate_puzzle(int(arg)):
