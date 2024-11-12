@@ -116,13 +116,17 @@ class LoadGameFrame(tk.Frame):
 
     def place_widgets(self):
         """Places the required widgets on the screen"""
-        self.generate.grid(row=0, column=0, columnspan=2)
+        self.generate.grid(row=0, column=0)
         self.user.grid(row=1, column=0)
         self.user_game_input.grid(row=1, column=1)
         self.load.grid(row=2, column=0)
         self.line_input.grid(row=2, column=1)
         self.load_any.grid(row=3, column=0)
         self.settings.grid(row=4, column=0)
+        tk.Label(self, text="""Generate: will create a new puzzle\n
+        User input: write the sudoku in the textbox with blank squares represented by 0\n
+        Load: input the puzzle number to load\n
+        Load random: load a random puzzle from the database\n""").grid(row=5, column=0, columnspan=4)
 
     def setting_update(self):
         """If the dimensions of the puzzle are 16x16 or the difficulty level is hard, a puzzle cannot be generated,
@@ -527,6 +531,12 @@ class SettingsFrame(tk.Frame):
         for i in range(3):
             self.difficulty[i].grid(row=9, column=i)
         self.return_button.grid(row=10, column=0)
+        tk.Label(self, text= """Hint number: the maximum number of hints the user can be given\n
+        Time limit: number of minutes\n
+        Sandwich sudoku: sum of values between 1 and 9 displayed (9x9 only)\n
+        Highlight clashes: clashing cells highlighted in red\n
+        Highlights hints: cells highlighted in blue if they contain the same value\n
+        Display moves: guesses are automatically filled in (4x4 and 9x9 only)""").grid(row=11, column=0, columnspan=3)
 
 
 if __name__ == "__main__":
