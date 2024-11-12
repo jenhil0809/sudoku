@@ -75,13 +75,13 @@ class LoadGameFrame(tk.Frame):
         self.master: GameApp = master
         self.user_game = tk.StringVar()
         self.line_number = tk.StringVar()
-        self.generate = tk.Button(self, text="Generate", command=self.generate_game)
-        self.user = tk.Button(self, text="User input", command=self.input_game)
-        self.load = tk.Button(self, text="Load", command=self.load_game)
-        self.load_any = tk.Button(self, text="Load random", command=self.load_random)
-        self.settings = tk.Button(self, text="Settings", command=self.master.open_settings)
-        self.user_game_input = tk.Entry(self, textvariable=self.user_game)
-        self.line_input = tk.Entry(self, textvariable=self.line_number)
+        self.generate = tk.Button(self, text="Generate", command=self.generate_game, width=80)
+        self.user = tk.Button(self, text="User input", command=self.input_game, width=24)
+        self.load = tk.Button(self, text="Load", command=self.load_game, width=36)
+        self.load_any = tk.Button(self, text="Load random", command=self.load_random, width=80)
+        self.settings = tk.Button(self, text="Settings", command=self.master.open_settings, width=80)
+        self.user_game_input = tk.Entry(self, textvariable=self.user_game, width=64)
+        self.line_input = tk.Entry(self, textvariable=self.line_number, width=50)
         self.setting_update()
         self.place_widgets()
 
@@ -116,14 +116,14 @@ class LoadGameFrame(tk.Frame):
 
     def place_widgets(self):
         """Places the required widgets on the screen"""
-        self.generate.grid(row=0, column=0)
+        self.generate.grid(row=0, column=0, columnspan=4)
         self.user.grid(row=1, column=0)
-        self.user_game_input.grid(row=1, column=1)
-        self.load.grid(row=2, column=0)
-        self.line_input.grid(row=2, column=1)
-        self.load_any.grid(row=3, column=0)
-        self.settings.grid(row=4, column=0)
-        tk.Label(self, text="""Generate: will create a new puzzle\n
+        self.user_game_input.grid(row=1, column=1, columnspan=3)
+        self.load.grid(row=2, column=0, columnspan=2)
+        self.line_input.grid(row=2, column=2, columnspan=2)
+        self.load_any.grid(row=3, column=0, columnspan=4)
+        self.settings.grid(row=4, column=0, columnspan=4)
+        tk.Label(self, text="""\n\nGenerate: will create a new puzzle\n
         User input: write the sudoku in the textbox with blank squares represented by 0\n
         Load: input the puzzle number to load\n
         Load random: load a random puzzle from the database\n""").grid(row=5, column=0, columnspan=4)
