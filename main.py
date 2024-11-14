@@ -289,6 +289,8 @@ class Puzzle:
         cols = []
         rows = []
         vals = [square.val for square in self.squares]
+        for cell in self.squares:
+            cell.reset()
         self.solve()
         for i in range(9):
             rows.append(self.sandwich_sums(i, True))
