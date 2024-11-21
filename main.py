@@ -353,7 +353,7 @@ class Game:
         Parameters
         ----------
         mode: str
-            "user" if a user inputed puzzle should be loaded
+            "user" if a user inputted puzzle should be loaded
             "load" if a specific puzzle should be loaded from a file
             "load_random" if a random puzzle should be loaded from a file
             "generate" if a new puzzle should be created

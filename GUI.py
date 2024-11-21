@@ -417,6 +417,7 @@ class SudokuGrid(tk.Frame):
                     self.master.game.puzzle.squares[i].set_value(previous_vals[i])
 
     def add_sandwich(self):
+        """Add required values for sandwich sudoku at end of rows/columns"""
         self.sandwich = True
         sandwich = self.master.game.puzzle.sandwich()
         for i in range(9):
@@ -424,6 +425,7 @@ class SudokuGrid(tk.Frame):
             tk.Label(self, text=str(sandwich[1][i])).grid(row=20, column=i + i // 3)
 
     def remove_sandwich(self):
+        """Make the values at end of rows/columns blank"""
         self.sandwich = False
         for i in range(9):
             tk.Label(self, text="   ").grid(row=2 * i + i // 3 + 1, column=12)
