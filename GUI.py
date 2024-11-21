@@ -178,8 +178,7 @@ class SudokuGrid(tk.Frame):
                         range(self.master.settings["dimensions"].get() ** 2)]
         self.guesses = [tk.Button(self, text=" ", height=1, width=w, bg="light grey",
                                   command=lambda val=i: self.button_clicked(val + 1000), font="SegoeIU 6", fg="gray23")
-                        for i in
-                        range(self.master.settings["dimensions"].get() ** 2)]
+                        for i in range(self.master.settings["dimensions"].get() ** 2)]
         self.complete = tk.Button(self, text="Complete puzzle", command=self.solve)
         self.give_up = tk.Button(self, text="Return to menu",
                                  command=lambda: self.master.new_frame(LoadGameFrame(self.master)))
@@ -438,8 +437,7 @@ class SudokuGrid(tk.Frame):
                 self.master.settings["dimensions"].get() ** 1.5),
                                  column=i % int(self.master.settings["dimensions"].get()) + i % self.master.settings[
                                      "dimensions"].get() // int(self.master.settings["dimensions"].get() ** .5),
-                                 padx=self.pad,
-                                 pady=self.pad)
+                                 padx=self.pad, pady=self.pad)
         for i in range(self.master.settings["dimensions"].get() ** 2):
             self.guesses[i].grid(row=i // int(self.master.settings["dimensions"].get()) * 2 + i // int(
                 self.master.settings["dimensions"].get() ** 1.5),
@@ -453,8 +451,8 @@ class SudokuGrid(tk.Frame):
                     "dimensions"].get())
             tk.Label(self, text="|\n" * 35).grid(row=0, column=int(
                 (self.master.settings["dimensions"].get() ** 0.5) * (i + 1) + i),
-                                                 rowspan=int(self.master.settings["dimensions"].get() ** 0.5) +
-                                                         self.master.settings["dimensions"].get() * 2)
+                    rowspan=int(self.master.settings["dimensions"].get() ** 0.5) +
+                    self.master.settings["dimensions"].get() * 2)
         if self.master.settings["sandwich"].get() and len(self.squares) == 81:
             self.add_sandwich()
         self.timer.grid(row=1, column=50)
@@ -498,12 +496,10 @@ class SettingsFrame(tk.Frame):
         self.sandwich = tk.Checkbutton(self, variable=self.master.settings["sandwich"])
         self.dimensions = [
             (tk.Radiobutton(self, text=f"{i ** 2}x{i ** 2}", value=i ** 2, variable=self.master.settings["dimensions"]))
-            for i in
-            range(2, 5)]
+            for i in range(2, 5)]
         difficulties = ["Easy", "Medium", "Hard"]
-        self.difficulty = [
-            (tk.Radiobutton(self, text=f"{difficulties[i]}", value=difficulties[i],
-                            variable=self.master.settings["difficulty"])) for i in range(3)]
+        self.difficulty = [(tk.Radiobutton(self, text=f"{difficulties[i]}", value=difficulties[i],
+                                            variable=self.master.settings["difficulty"])) for i in range(3)]
         self.clash_highlight = tk.Checkbutton(self, variable=self.master.settings["clashes"])
         self.clash_highlight.select()
         self.hints_highlight = tk.Checkbutton(self, variable=self.master.settings["highlights"])
