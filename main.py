@@ -372,12 +372,14 @@ class Game:
         if size != self.size:
             self.size = size
             self.vals = self.set_vals()
+
         if mode == "user":
             if len(arg) == self.size ** 2:
                 self.puzzle = Puzzle(arg, self.size)
                 return self.puzzle.num_solutions() == 1
             else:
                 return False
+
         elif mode == "load":
             try:
                 user_input = int(arg)
@@ -385,6 +387,8 @@ class Game:
                     self.puzzle = Puzzle(file.readlines()[user_input], self.size)
                     return True
             except IndexError:
+                return False
+            except ValueError:
                 return False
 
         elif mode == "load_random":
