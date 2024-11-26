@@ -169,6 +169,10 @@ class SudokuGrid(tk.Frame):
         self.create_keyboard_event("backspace", "0")
         self.create_keyboard_event("delete", "0")
         self.create_keyboard_event("0", "0")
+        keyboard.on_press_key("w", lambda _: self.move_square(-self.master.settings["dimensions"].get()))
+        keyboard.on_press_key("s", lambda _: self.move_square(self.master.settings["dimensions"].get()))
+        keyboard.on_press_key("a", lambda _: self.move_square(-1))
+        keyboard.on_press_key("d", lambda _: self.move_square(1))
         if self.master.settings["dimensions"].get() == 4:
             h, w, self.pad = 4, 10, 5
         elif self.master.settings["dimensions"].get() == 9:
@@ -202,6 +206,10 @@ class SudokuGrid(tk.Frame):
         self.master.coord.set(0)
         self.place_widgets()
         self.update_timer()
+
+    def move_square(self, val):
+        if 0 <= self.master.coord.get() + val < len(self.squares):
+            self.button_clicked(self.master.coord.get() + val)
 
     def update_timer(self):
         """
