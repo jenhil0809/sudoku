@@ -1,3 +1,4 @@
+from functools import cache
 from random import choice, randint, seed
 
 
@@ -221,14 +222,15 @@ class Puzzle:
         """
         if not self.solve():
             return 0
-        solution = [cell.val for cell in self.squares][:-1]
+        solution = "".join([cell.val for cell in self.squares][:-1])
         self.reset()
         if not self.solve(excl=solution):
             return 1
         else:
             return 2
 
-    def solve(self, i=0, excl=None):
+    @cache
+    def solve(self, i=0, excl:None|str=None):
         """
         Attempt to solve the sudoku using backtracking
         Parameters
@@ -241,9 +243,13 @@ class Puzzle:
         Bool
             True if a solution (other than that given by excl) is found, otherwise False
         """
+        if excl is not None:
+            new_excl = [char for char in excl]
+        else:
+            new_excl = None
         # every square filled
         if self.squares[i] == self.squares[-1]:
-            if not [cell.val for cell in self.squares][:-1] == excl:
+            if not [cell.val for cell in self.squares][:-1] == new_excl:
                 for n in self.vals:
                     self.squares[i].set_value(str(n))
                     if self.check_valid():
