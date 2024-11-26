@@ -164,15 +164,20 @@ class SudokuGrid(tk.Frame):
         self.val = tk.StringVar(value="0")
         self.start_time = time.time()
         self.timer = tk.Label(self, text=f"{int(time.time() - self.start_time)}")
+        self.arrow = False
+        keyboard.on_press_key("w", lambda _: self.move_square(False, -self.master.settings["dimensions"].get()))
+        keyboard.on_press_key("up", lambda _: self.move_square(True, -self.master.settings["dimensions"].get()))
+        keyboard.on_press_key("s", lambda _: self.move_square(False, self.master.settings["dimensions"].get()))
+        keyboard.on_press_key("down", lambda _: self.move_square(True, self.master.settings["dimensions"].get()))
+        keyboard.on_press_key("a", lambda _: self.move_square(False, -1))
+        keyboard.on_press_key("left", lambda _: self.move_square(True, -1))
+        keyboard.on_press_key("d", lambda _: self.move_square(False, 1))
+        keyboard.on_press_key("right", lambda _: self.move_square(True, 1))
         for char in self.master.game.puzzle.vals:
             self.create_keyboard_event(char.lower(), char.lower())
         self.create_keyboard_event("backspace", "0")
         self.create_keyboard_event("delete", "0")
         self.create_keyboard_event("0", "0")
-        keyboard.on_press_key("w", lambda _: self.move_square(-self.master.settings["dimensions"].get()))
-        keyboard.on_press_key("s", lambda _: self.move_square(self.master.settings["dimensions"].get()))
-        keyboard.on_press_key("a", lambda _: self.move_square(-1))
-        keyboard.on_press_key("d", lambda _: self.move_square(1))
         if self.master.settings["dimensions"].get() == 4:
             h, w, self.pad = 4, 10, 5
         elif self.master.settings["dimensions"].get() == 9:
@@ -207,9 +212,12 @@ class SudokuGrid(tk.Frame):
         self.place_widgets()
         self.update_timer()
 
-    def move_square(self, val):
-        if 0 <= self.master.coord.get() + val < len(self.squares):
-            self.button_clicked(self.master.coord.get() + val)
+    def move_square(self, arrow_key, val):
+        if not self.solved:
+            if arrow_key:
+                self.arrow = True
+            if 0 <= self.master.coord.get() + val < len(self.squares):
+                self.button_clicked(self.master.coord.get() + val)
 
     def update_timer(self):
         """
@@ -270,8 +278,11 @@ class SudokuGrid(tk.Frame):
         """
         try:
             if not self.solved:
-                self.val.set(x)
-                self.change_val()
+                if not self.arrow:
+                    self.val.set(x)
+                    self.change_val()
+                else:
+                    self.arrow = False
         except tk.TclError:
             pass
 
