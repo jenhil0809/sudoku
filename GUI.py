@@ -165,8 +165,10 @@ class SudokuGrid(tk.Frame):
         self.start_time = time.time()
         self.timer = tk.Label(self, text=f"{int(time.time() - self.start_time)}")
         for char in self.master.game.puzzle.vals:
-            self.create_keyboard_event(char.lower())
-        self.create_keyboard_event("0")
+            self.create_keyboard_event(char.lower(), char.lower())
+        self.create_keyboard_event("backspace", "0")
+        self.create_keyboard_event("delete", "0")
+        self.create_keyboard_event("0", "0")
         if self.master.settings["dimensions"].get() == 4:
             h, w, self.pad = 4, 10, 5
         elif self.master.settings["dimensions"].get() == 9:
@@ -197,6 +199,7 @@ class SudokuGrid(tk.Frame):
         self.add_all_guesses()
         self.all_guesses_shown = self.master.settings["display_moves"]
         self.sandwich = False
+        self.master.coord.set(0)
         self.place_widgets()
         self.update_timer()
 
@@ -239,7 +242,7 @@ class SudokuGrid(tk.Frame):
         self.highlight_errors()
         self.update_timer()
 
-    def create_keyboard_event(self, x):
+    def create_keyboard_event(self, input, response):
         """
         Creates a keyboard event that allows the value of self.val to be controlled by key presses
         Parameters
@@ -247,7 +250,7 @@ class SudokuGrid(tk.Frame):
         x: str
             The value that will trigger the response
         """
-        keyboard.on_press_key(x, lambda _: self.keypress(x))
+        keyboard.on_press_key(input, lambda _: self.keypress(response))
 
     def keypress(self, x):
         """
@@ -279,9 +282,9 @@ class SudokuGrid(tk.Frame):
                 if self.master.game.puzzle.squares[i].original:
                     self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="light grey")
                 elif previous_vals[i] == self.master.game.puzzle.squares[i].val:
-                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="palegreen")
+                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="spring green")
                 else:
-                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="firebrick1")
+                    self.squares[i].config(text=self.master.game.puzzle.squares[i].val, bg="brown1")
 
     def button_clicked(self, val: int):
         """
@@ -333,7 +336,7 @@ class SudokuGrid(tk.Frame):
                     self.master.game.puzzle.add_guess(self.master.coord.get() - 1000,
                                                       str(self.val.get()).upper())
                     self.guesses[self.master.coord.get() - 1000].config(
-                        text="".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
+                        text=",".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
                     self.place_widgets()
                 else:
                     self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses = []
@@ -360,11 +363,11 @@ class SudokuGrid(tk.Frame):
     def highlight_errors(self):
         """Any clashing cells are highlighted in red"""
         for square in self.squares:
-            if square["bg"] in ["firebrick1", "palegreen"]:
+            if square["bg"] in ["brown1", "spring green"]:
                 square.config(bg="light grey")
         if self.master.settings["clashes"].get():
             for i in self.master.game.puzzle.return_clashes():
-                self.squares[i].config(bg="firebrick1")
+                self.squares[i].config(bg="brown1")
 
     def add_all_guesses(self):
         """The guesses cells are updated to all possible values which would not cause a clash if the dimensions of
@@ -372,7 +375,7 @@ class SudokuGrid(tk.Frame):
         if self.master.settings["display_moves"].get() and self.master.settings["dimensions"].get() != 16:
             self.master.game.puzzle.add_all_guesses()
         for i in range(len(self.guesses)):
-            self.guesses[i].config(text="".join(self.master.game.puzzle.squares[i].guesses))
+            self.guesses[i].config(text=",".join(self.master.game.puzzle.squares[i].guesses))
 
     def setting_update(self):
         """Respond to any changes in the settings by changing the hint number, adding/removing highlights and changing
