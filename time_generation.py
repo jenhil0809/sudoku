@@ -18,7 +18,7 @@ for i in range(0, 50):
     for n in range(1):
         game.load_game("generate", i)
     t_end = perf_counter()
-    times.append((t_end - t_start) / 1)
+    times.append((t_end - t_start) / 2)
 
 plt.scatter(blanks, times)
 plt.show()

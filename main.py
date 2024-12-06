@@ -224,13 +224,14 @@ class Puzzle:
             return 0
         solution = "".join([cell.val for cell in self.squares][:-1])
         self.reset()
+        self.solve.cache_clear()
         if not self.solve(excl=solution):
             return 1
         else:
             return 2
 
     @cache
-    def solve(self, i=0, excl:None|str=None):
+    def solve(self, i=0, excl:None|str=None, current = ""):
         """
         Attempt to solve the sudoku using backtracking
         Parameters
@@ -259,12 +260,12 @@ class Puzzle:
                 return False
         # If already filled skip to next square
         if self.squares[i].val != "0" and self.squares[i] != self.squares[-1]:
-            return self.solve(i + 1, excl)
+            return self.solve(i + 1, excl, "".join([cell.val for cell in self.squares]))
         # Else go through other 9 values until a solution is found
         for n in self.vals:
             self.squares[i].set_value(str(n))
             if self.check_valid() and self.squares[i] != self.squares[-1]:
-                if self.solve(i + 1, excl):
+                if self.solve(i + 1, excl, "".join([cell.val for cell in self.squares])):
                     return True
             # Backtrack
             self.squares[i].set_value("0")

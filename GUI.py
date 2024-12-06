@@ -95,7 +95,10 @@ class LoadGameFrame(tk.Frame):
                 if self.master.game.load_game("generate", str(randint(15, 29)), 9):
                     self.master.new_frame(SudokuGrid(self.master))
             elif self.master.settings["difficulty"].get() == "Medium":
-                if self.master.game.load_game("generate", str(randint(30, 41)), 9):
+                if self.master.game.load_game("generate", str(randint(30, 40)), 9):
+                    self.master.new_frame(SudokuGrid(self.master))
+            elif self.master.settings["difficulty"].get() == "Hard":
+                if self.master.game.load_game("generate", str(randint(41, 55)), 9):
                     self.master.new_frame(SudokuGrid(self.master))
 
     def input_game(self):
@@ -131,7 +134,7 @@ class LoadGameFrame(tk.Frame):
     def setting_update(self):
         """If the dimensions of the puzzle are 16x16 or the difficulty level is hard, a puzzle cannot be generated,
         so this option should be disabled"""
-        if self.master.settings["dimensions"].get() == 16 or self.master.settings["difficulty"].get() == "Hard":
+        if self.master.settings["dimensions"].get() == 16:# or self.master.settings["difficulty"].get() == "Hard":
             self.generate.config(state="disabled")
         else:
             self.generate.config(state="normal")
@@ -295,6 +298,7 @@ class SudokuGrid(tk.Frame):
             previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
             for cell in self.master.game.puzzle.squares:
                 cell.reset()
+            self.master.game.puzzle.solve.cache_clear()
             self.master.game.puzzle.solve()
             for i in range(len(self.squares)):
                 self.guesses[i].config(bg="light grey")
@@ -425,6 +429,7 @@ class SudokuGrid(tk.Frame):
                 self.master.game.puzzle.squares[self.master.coord.get()].original:
             previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
             self.master.game.puzzle.reset()
+            self.master.game.puzzle.solve.cache_clear()
             self.master.game.puzzle.solve()
             self.val.set([square.val for square in self.master.game.puzzle.squares][self.master.coord.get()])
             for i in range(len(self.master.game.puzzle.squares)):
