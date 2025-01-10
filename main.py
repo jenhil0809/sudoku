@@ -47,9 +47,12 @@ class Square:
         val: str
             the value that should be added to the list
         """
-        if val not in self.guesses:
-            self.guesses.append(val)
-            self.guesses.sort()
+        if val != "0":
+            if val not in self.guesses:
+                self.guesses.append(val)
+                self.guesses.sort()
+        else:
+            self.guesses = []
 
     def set_original(self, val):
         """

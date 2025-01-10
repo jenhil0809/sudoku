@@ -104,3 +104,21 @@ def test_load_game():
 def test_sandwich():
     assert puzzles[0].sandwich() == ([29, 22, 0, 5, 7, 21, 0, 4, 8], [28, 10, 10, 0, 4, 0, 14, 0, 17])
     assert puzzles[1].sandwich() == ([28, 12, 19, 17, 15, 0, 17, 14, 25], [21, 35, 0, 22, 17, 0, 19, 17, 8])
+
+def test_add_guess():
+    puzzles[0].add_guess(1, "2")
+    puzzles[0].add_guess(1, "1")
+    assert puzzles[0].squares[1].guesses == ["1", "2"]
+    puzzles[0].add_guess(1, "0")
+    assert puzzles[0].squares[1].guesses == []
+
+def test_add_all_guesses():
+    puzzles[0].add_all_guesses()
+    assert puzzles[0].squares[0].guesses == ["1"]
+    assert puzzles[0].squares[1].guesses == []
+    assert puzzles[0].squares[2].guesses == ["1", "6"]
+
+def test_return_clashes():
+    assert puzzles[0].return_clashes() == set()
+    assert puzzles[4].return_clashes() == set([0, 7])
+    assert puzzles[7].return_clashes() == set()

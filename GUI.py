@@ -355,16 +355,14 @@ class SudokuGrid(tk.Frame):
         """The currently selected cell has its value changed to the value held by self.val"""
         if not self.solved:
             if self.master.coord.get() >= 1000:
+                self.master.game.puzzle.add_guess(self.master.coord.get() - 1000,
+                                                  str(self.val.get()).upper())
                 if self.val.get() != "0":
-                    self.master.game.puzzle.add_guess(self.master.coord.get() - 1000,
-                                                      str(self.val.get()).upper())
                     self.guesses[self.master.coord.get() - 1000].config(
                         text=",".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
-                    self.place_widgets()
                 else:
-                    self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses = []
                     self.guesses[self.master.coord.get() - 1000].config(text=" ")
-                    self.place_widgets()
+                self.place_widgets()
             else:
                 self.master.game.puzzle.change_value(self.master.coord.get(),
                                                      str(self.val.get()).upper())
