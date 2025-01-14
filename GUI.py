@@ -168,6 +168,7 @@ class SudokuGrid(tk.Frame):
         self.start_time = time.time()
         self.timer = tk.Label(self, text=f"{int(time.time() - self.start_time)}")
         self.arrow = False
+        self.sandwich_vals = None
         keyboard.on_press_key("w", lambda _: self.move_square(False, -self.master.settings["dimensions"].get()))
         keyboard.on_press_key("up", lambda _: self.move_square(True, -self.master.settings["dimensions"].get()))
         keyboard.on_press_key("s", lambda _: self.move_square(False, self.master.settings["dimensions"].get()))
@@ -443,10 +444,11 @@ class SudokuGrid(tk.Frame):
     def add_sandwich(self):
         """Add required values for sandwich sudoku at end of rows/columns"""
         self.sandwich = True
-        sandwich = self.master.game.puzzle.sandwich()
+        if self.sandwich_vals is None:
+            self.sandwich_vals = self.master.game.puzzle.sandwich()
         for i in range(9):
-            tk.Label(self, text=str(sandwich[0][i])).grid(row=2 * i + i // 3 + 1, column=12)
-            tk.Label(self, text=str(sandwich[1][i])).grid(row=20, column=i + i // 3)
+            tk.Label(self, text=str(self.sandwich_vals[0][i])).grid(row=2 * i + i // 3 + 1, column=12)
+            tk.Label(self, text=str(self.sandwich_vals[1][i])).grid(row=20, column=i + i // 3)
 
     def remove_sandwich(self):
         """Make the values at end of rows/columns blank"""
