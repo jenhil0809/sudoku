@@ -217,11 +217,14 @@ class SudokuGrid(tk.Frame):
         self.update_timer()
 
     def move_square(self, arrow_key, val):
-        if not self.solved:
-            if arrow_key:
-                self.arrow = True
-            if 0 <= self.master.coord.get() + val < len(self.squares):
-                self.button_clicked(self.master.coord.get() + val)
+        try:
+            if not self.solved:
+                if arrow_key:
+                    self.arrow = True
+                if 0 <= self.master.coord.get() + val < len(self.squares):
+                    self.button_clicked(self.master.coord.get() + val)
+        except tk.TclError:
+            pass
 
     def update_timer(self):
         """
@@ -262,15 +265,17 @@ class SudokuGrid(tk.Frame):
         self.highlight_errors()
         self.update_timer()
 
-    def create_keyboard_event(self, input, response):
+    def create_keyboard_event(self, trigger, response):
         """
         Creates a keyboard event that allows the value of self.val to be controlled by key presses
         Parameters
         ----------
-        x: str
+        trigger: str
             The value that will trigger the response
+        response: str
+            The result of the keypress (usually same as input)
         """
-        keyboard.on_press_key(input, lambda _: self.keypress(response))
+        keyboard.on_press_key(trigger, lambda _: self.keypress(response))
 
     def keypress(self, x):
         """
