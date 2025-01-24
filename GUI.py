@@ -134,7 +134,7 @@ class LoadGameFrame(tk.Frame):
     def setting_update(self):
         """If the dimensions of the puzzle are 16x16 or the difficulty level is hard, a puzzle cannot be generated,
         so this option should be disabled"""
-        if self.master.settings["dimensions"].get() == 16:# or self.master.settings["difficulty"].get() == "Hard":
+        if self.master.settings["dimensions"].get() == 16 or self.master.settings["difficulty"].get() == "Hard":
             self.generate.config(state="disabled")
         else:
             self.generate.config(state="normal")
