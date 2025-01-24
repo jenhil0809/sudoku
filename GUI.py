@@ -286,12 +286,11 @@ class SudokuGrid(tk.Frame):
             The value to set self.val to
         """
         try:
-            if not self.solved:
-                if not self.arrow:
-                    self.val.set(x)
-                    self.change_val()
-                else:
-                    self.arrow = False
+            if not self.arrow:
+                self.val.set(x)
+                self.change_val()
+            else:
+                self.arrow = False
         except tk.TclError:
             pass
 
