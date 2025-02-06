@@ -5,8 +5,8 @@ puzzles = [main.Puzzle("07058302005920030034000650779500063200369710068000270091
            main.Puzzle("913000500607000024050080070079000000002090043000004090040001900706009005001006407"),
            main.Puzzle("926571483351486279874923516582367194149258367763100825238700651617835942495612738"),
            main.Puzzle("270583020059200300340006507795000632003697100680002700914835076030701495567429013"),
-           main.Puzzle("000000000000000000000000000000000000000000000000000000000000000000000000000000008"),
-           main.Puzzle("790058270004607058503002670040270506039500180670019002900701004068005700307480025"),
+           main.Puzzle("000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+           main.Puzzle("071583020059200300340006507795000632003697100680002700914835076030701495567429013"),
            main.Puzzle("176583924859274361342916587795148632423697158681352749914835276238761495567429813"),
            ]
 
@@ -14,13 +14,12 @@ game = main.Game()
 
 
 def test_num_solutions():
-    assert puzzles[0].num_solutions() == 1
-    assert puzzles[1].num_solutions() == 1
-    assert puzzles[2].num_solutions() == 1
-    assert puzzles[3].num_solutions() == 2
-    assert puzzles[4].num_solutions() == 0
-    assert puzzles[5].num_solutions() == 2
-    assert puzzles[6].num_solutions() == 0
+    assert puzzles[0].num_solutions() == 1 # valid
+    assert puzzles[7].num_solutions() == 1 # completed
+    assert puzzles[3].num_solutions() == 2 # multiple solutions
+    assert puzzles[4].num_solutions() == 0 # clashing vals
+    assert puzzles[5].num_solutions() == 2 # empty grid
+    assert puzzles[6].num_solutions() == 0 # no solutions, but no clashes
 
 
 def test_solve():
@@ -63,7 +62,7 @@ def test_reset():
 
 def test_check_valid():
     assert puzzles[0].check_valid() is True
-    assert puzzles[6].check_valid() is False
+    assert puzzles[4].check_valid() is False
 
 
 def test_change_value():
@@ -119,6 +118,6 @@ def test_add_all_guesses():
     assert puzzles[0].squares[2].guesses == ["1", "6"]
 
 def test_return_clashes():
-    assert puzzles[0].return_clashes() == set()
+    assert puzzles[1].return_clashes() == set()
     assert puzzles[4].return_clashes() == set([0, 7])
     assert puzzles[7].return_clashes() == set()
