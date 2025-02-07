@@ -121,6 +121,8 @@ class Puzzle:
             The values that can be placed in a cell
         self.groups: list of Groups
             All the groups that are in the puzzle
+        self.squares: list of Squares
+            All the squares that the puzzle is made up of
         """
         self.size = size
         if self.size == 4:
@@ -166,8 +168,11 @@ class Puzzle:
         val: str
             the value the cell should store
         """
-        if not self.squares[square].original:
-            self.squares[square].set_value(val)
+        try:
+            if not self.squares[square].original and (val in self.vals or val == "0"):
+                self.squares[square].set_value(val)
+        except IndexError:
+            pass
 
     def add_guess(self, square, val):
         """

@@ -1,3 +1,5 @@
+import pytest
+
 import main
 
 puzzles = [main.Puzzle("070583020059200300340006507795000632003697100680002700914835076030701495567429013"),
@@ -9,6 +11,9 @@ puzzles = [main.Puzzle("07058302005920030034000650779500063200369710068000270091
            main.Puzzle("071583020059200300340006507795000632003697100680002700914835076030701495567429013"),
            main.Puzzle("176583924859274361342916587795148632423697158681352749914835276238761495567429813"),
            main.Puzzle("0201100424133002", 4),
+           main.Puzzle("0211100424133002", 4),
+           main.Puzzle("308DC05B790F200G290CDAE00B0G6000500B00700623C00000060903D0E004000500900031070C0D000451C0000200G01000AD48509EFB20C2E80B37GD049100B00E1F000A0D030008C5009000B04GD040000CBA6E0518F2F03AG5004008B00984A30ED0005000009B0032F100D00E006C00000003FBD000E00008G01000390B", 4),
+           main.Puzzle("308DC05B790F208G290CDAE00B0G6000500B00700623C00000060903D0E004000500900031070C0D000451C0000200G01000AD48509EFB20C2E80B37GD049100B00E1F000A0D030008C5009000B04GD040000CBA6E0518F2F03AG5004008B00984A30ED0005000009B0032F100D00E006C00000003FBD000E00008G01000390B", 4),
            ]
 
 game = main.Game()
@@ -52,22 +57,24 @@ def test_reset():
 
 
 def test_check_valid():
-    assert puzzles[0].check_valid() is True
-    assert puzzles[4].check_valid() is False
+    assert puzzles[0].check_valid() is True # 9x9 valid
+    assert puzzles[4].check_valid() is False # 9x9 error
+    assert puzzles[8].check_valid() is True # 4x4 valid
+    assert puzzles[9].check_valid() is False # 4x4 error
+    assert puzzles[10].check_valid() is True # 16x16 valid
+    assert puzzles[11].check_valid() is False # 16x16 error
 
 
 def test_change_value():
-    puzzles[0].change_value(1, "1")
-    puzzles[0].change_value(2, "7")
-    puzzles[0].change_value(2, "2")
-    puzzles[0].change_value(9, "4")
-    assert [cell.val for cell in puzzles[0].squares] == ['0', '7', '2', '5', '8', '3', '0', '2', '0', '4', '5', '9',
-                                                         '2', '0', '0', '3', '0', '0', '3', '4', '0', '0', '0', '6',
-                                                         '5', '0', '7', '7', '9', '5', '0', '0', '0', '6', '3', '2',
-                                                         '0', '0', '3', '6', '9', '7', '1', '0', '0', '6', '8', '0',
-                                                         '0', '0', '2', '7', '0', '0', '9', '1', '4', '8', '3', '5',
-                                                         '0', '7', '6', '0', '3', '0', '7', '0', '1', '4', '9', '5',
-                                                         '5', '6', '7', '4', '2', '9', '0', '1', '3']
+    puzzles[0].change_value(1, "1") # Original
+    puzzles[0].change_value(2, "6") # Valid
+    puzzles[0].change_value(6, "6") # Valid
+    puzzles[0].change_value(2, "8") # Overwrite
+    puzzles[0].change_value(6, "0") # Clear
+    puzzles[0].change_value(100, "2")
+    puzzles[0].change_value(8, "A")
+    assert ("".join([cell.val for cell in puzzles[0].squares]) ==
+            '078583020059200300340006507795000632003697100680002700914835076030701495567429013')
 
 
 def test_completed():
@@ -81,15 +88,14 @@ def test_load_game():
                           "070583020059200300340006507795000632003697100680002700914835076030701495567429013") is True
     assert game.load_game("user",
                           "07058302005920030034000650779500063200369710068000270091483507603070149556742901") is False
-    assert [cell.val for cell in game.puzzle.squares] == ['0', '7', '0', '5', '8', '3', '0', '2', '0', '0', '5', '9',
-                                                          '2', '0', '0', '3', '0', '0', '3', '4', '0', '0', '0', '6',
-                                                          '5', '0', '7', '7', '9', '5', '0', '0', '0', '6', '3', '2',
-                                                          '0', '0', '3', '6', '9', '7', '1', '0', '0', '6', '8', '0',
-                                                          '0', '0', '2', '7', '0', '0', '9', '1', '4', '8', '3', '5',
-                                                          '0', '7', '6', '0', '3', '0', '7', '0', '1', '4', '9', '5',
-                                                          '5', '6', '7', '4', '2', '9', '0', '1', '3']
+    assert ("".join([cell.val for cell in game.puzzle.squares]) ==
+            "070583020059200300340006507795000632003697100680002700914835076030701495567429013")
     assert game.load_game("load", "10") is True
     assert game.load_game("load", "1000") is False
+    assert game.load_game("load_random", "hard") is True
+    assert [square.val for square in game.puzzle.squares].count("0") >= 42
+    assert game.load_game("generate", "20") is True
+    assert game.puzzle.check_valid()
 
 def test_sandwich():
     assert puzzles[0].sandwich() == ([29, 22, 0, 5, 7, 21, 0, 4, 8], [28, 10, 10, 0, 4, 0, 14, 0, 17])
