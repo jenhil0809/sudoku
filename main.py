@@ -414,11 +414,11 @@ class Game:
                     self.puzzle = Puzzle(choice([puzzle for puzzle in lines if puzzle.count("0") < 30]), self.size)
                     return True
                 elif arg.lower() == "medium":
-                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 30 <= puzzle.count("0") < 42]),
+                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 30 <= puzzle.count("0") < 41]),
                                          self.size)
                     return True
                 elif arg.lower() == "hard":
-                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 42 <= puzzle.count("0")]), self.size)
+                    self.puzzle = Puzzle(choice([puzzle for puzzle in lines if 41 <= puzzle.count("0")]), self.size)
                     return True
                 else:
                     return False
