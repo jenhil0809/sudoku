@@ -126,12 +126,11 @@ class Puzzle:
         """
         self.size = size
         if self.size == 4:
-            vals = [str(val + 1) for val in range(4)]
+            self.vals = [str(val + 1) for val in range(4)]
         elif self.size == 9:
-            vals = [str(val + 1) for val in range(9)]
+            self.vals = [str(val + 1) for val in range(9)]
         else:
-            vals = [str(val + 1) for val in range(9)] + [char for char in "ABCDEFG"]
-        self.vals = vals
+            self.vals = [str(val + 1) for val in range(9)] + [char for char in "ABCDEFG"]
         self.squares = [Square(puzzle[i]) for i in range(self.size ** 2)]
         self.groups = ([Group([self.squares[i + j * self.size] for i in range(self.size)]) for j in range(self.size)] +
                        [Group([self.squares[i * self.size + j] for i in range(self.size)]) for j in range(self.size)] +
@@ -343,6 +342,8 @@ class Game:
         ----------
         self.puzzle: Puzzle|None
             the puzzle that the Game is holding or None if no puzzle has been created
+        self.vals: list of strings
+            All possible values a cell can have
         """
         self.puzzle: Puzzle | None = None
         self.size = size

@@ -9,6 +9,16 @@ class GameApp(tk.Tk):
     """Holds the frames to be displayed and settings"""
 
     def __init__(self):
+        """
+        self.coord: IntVar
+            The cell the user is currently in
+        self.game: Game
+            All possible values a cell can have
+        self.settings: dict
+            Stores all the settings
+        self.frame: LoadGameFrame|SudokuGrid|SettingsFrame
+            The frame to be displayed
+        """
         super().__init__()
         self.title("Sudoku")
         self.geometry(f"700x800")
