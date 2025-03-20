@@ -10,10 +10,8 @@ class GameApp(tk.Tk):
 
     def __init__(self):
         """
-        self.coord: IntVar
-            The cell the user is currently in
         self.game: Game
-            All possible values a cell can have
+            Represents the game being played
         self.settings: dict
             Stores all the settings
         self.frame: LoadGameFrame|SudokuGrid|SettingsFrame
@@ -22,7 +20,6 @@ class GameApp(tk.Tk):
         super().__init__()
         self.title("Sudoku")
         self.geometry(f"700x800")
-        self.coord = tk.IntVar()
         self.game = main.Game()
         self.settings = {"hint_num": tk.IntVar(value=3),
                          "timer_on": tk.IntVar(),
@@ -169,12 +166,15 @@ class SudokuGrid(tk.Frame):
             Allows the time since the user began solving the puzzle to be calculated
         self.val: tk.StringVar
             The value a cell's value should be changed to
+        self.coord: IntVar
+            The cell the user is currently in
         """
         super().__init__()
         self.master: GameApp = master
         self.solved = False
         self.hints_taken = 0
         self.val = tk.StringVar(value="0")
+        self.coord = tk.IntVar()
         self.start_time = time.time()
         self.timer = tk.Label(self, text=f"{int(time.time() - self.start_time)}")
         self.arrow = False
@@ -222,7 +222,7 @@ class SudokuGrid(tk.Frame):
         self.add_all_guesses()
         self.all_guesses_shown = self.master.settings["display_moves"]
         self.sandwich = False
-        self.master.coord.set(0)
+        self.coord.set(0)
         self.place_widgets()
         self.update_timer()
 
@@ -231,8 +231,8 @@ class SudokuGrid(tk.Frame):
             if not self.solved:
                 if arrow_key:
                     self.arrow = True
-                if 0 <= self.master.coord.get() + val < len(self.squares):
-                    self.button_clicked(self.master.coord.get() + val)
+                if 0 <= self.coord.get() + val < len(self.squares):
+                    self.button_clicked(self.coord.get() + val)
         except tk.TclError:
             pass
 
@@ -333,17 +333,17 @@ class SudokuGrid(tk.Frame):
             The coordinate of the cell clicked on (if a normal cell val < 1000, if a guess val >= 1000)
         """
         if not self.solved:
-            if self.master.coord.get() >= 1000:
-                self.guesses[self.master.coord.get() - 1000].config(bg="light grey")
+            if self.coord.get() >= 1000:
+                self.guesses[self.coord.get() - 1000].config(bg="light grey")
             else:
-                self.squares[self.master.coord.get()].config(bg="light grey")
+                self.squares[self.coord.get()].config(bg="light grey")
                 self.remove_highlights()
-            self.master.coord.set(val)
-            if self.master.coord.get() >= 1000:
-                self.guesses[self.master.coord.get() - 1000].config(bg="DeepSkyBlue2")
+            self.coord.set(val)
+            if self.coord.get() >= 1000:
+                self.guesses[self.coord.get() - 1000].config(bg="DeepSkyBlue2")
             else:
-                self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
-                self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
+                self.highlight(self.master.game.puzzle.squares[self.coord.get()].val)
+                self.squares[self.coord.get()].config(bg="DeepSkyBlue2")
             self.highlight_errors()
 
     def highlight(self, val):
@@ -358,7 +358,7 @@ class SudokuGrid(tk.Frame):
             for i in range(len(self.squares)):
                 if self.master.game.puzzle.squares[i].val == val.upper():
                     self.squares[i].config(bg="lightblue1")
-        self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
+        self.squares[self.coord.get()].config(bg="DeepSkyBlue2")
 
     def remove_highlights(self):
         """All cells that are highlighted light blue have their highlights removed"""
@@ -369,28 +369,28 @@ class SudokuGrid(tk.Frame):
     def change_val(self):
         """The currently selected cell has its value changed to the value held by self.val"""
         if not self.solved:
-            if self.master.coord.get() >= 1000:
-                self.master.game.puzzle.add_guess(self.master.coord.get() - 1000,
+            if self.coord.get() >= 1000:
+                self.master.game.puzzle.add_guess(self.coord.get() - 1000,
                                                   str(self.val.get()).upper())
                 if self.val.get() != "0":
-                    self.guesses[self.master.coord.get() - 1000].config(
-                        text=",".join(self.master.game.puzzle.squares[self.master.coord.get() - 1000].guesses))
+                    self.guesses[self.coord.get() - 1000].config(
+                        text=",".join(self.master.game.puzzle.squares[self.coord.get() - 1000].guesses))
                 else:
-                    self.guesses[self.master.coord.get() - 1000].config(text=" ")
+                    self.guesses[self.coord.get() - 1000].config(text=" ")
                 self.place_widgets()
             else:
-                self.master.game.puzzle.change_value(self.master.coord.get(),
+                self.master.game.puzzle.change_value(self.coord.get(),
                                                      str(self.val.get()).upper())
-                self.squares[self.master.coord.get()].config(
-                    text=str(self.master.game.puzzle.squares[self.master.coord.get()].val), fg="gray15")
-                if self.master.game.puzzle.squares[self.master.coord.get()].val == "0":
-                    self.squares[self.master.coord.get()].config(text=" ")
+                self.squares[self.coord.get()].config(
+                    text=str(self.master.game.puzzle.squares[self.coord.get()].val), fg="gray15")
+                if self.master.game.puzzle.squares[self.coord.get()].val == "0":
+                    self.squares[self.coord.get()].config(text=" ")
                 if self.master.game.puzzle.completed:
                     self.solve()
                 else:
                     self.remove_highlights()
                     self.highlight(str(self.val.get()))
-                    self.squares[self.master.coord.get()].config(bg="DeepSkyBlue2")
+                    self.squares[self.coord.get()].config(bg="DeepSkyBlue2")
                     self.place_widgets()
                 self.add_all_guesses()
         if not self.solved:
@@ -423,7 +423,7 @@ class SudokuGrid(tk.Frame):
             else:
                 self.hint_request.config(text="Show hint (0 left)")
             self.remove_highlights()
-            self.highlight(self.master.game.puzzle.squares[self.master.coord.get()].val)
+            self.highlight(self.master.game.puzzle.squares[self.coord.get()].val)
             self.highlight_errors()
             if self.all_guesses_shown and not self.master.settings['display_moves'].get():
                 for cell in self.master.game.puzzle.squares:
@@ -438,13 +438,13 @@ class SudokuGrid(tk.Frame):
     def show_hint(self):
         """If the cell is not one of the original cells, reveals the value that should be held by that cell and
         increments self.hints_taken by 1"""
-        if self.master.coord.get() < 1000 and self.hints_taken < self.master.settings["hint_num"].get() and not \
-                self.master.game.puzzle.squares[self.master.coord.get()].original:
+        if self.coord.get() < 1000 and self.hints_taken < self.master.settings["hint_num"].get() and not \
+                self.master.game.puzzle.squares[self.coord.get()].original:
             previous_vals = [cell.val for cell in self.master.game.puzzle.squares]
             self.master.game.puzzle.reset()
             self.master.game.puzzle.solve.cache_clear()
             self.master.game.puzzle.solve()
-            self.val.set([square.val for square in self.master.game.puzzle.squares][self.master.coord.get()])
+            self.val.set([square.val for square in self.master.game.puzzle.squares][self.coord.get()])
             for i in range(len(self.master.game.puzzle.squares)):
                 self.master.game.puzzle.squares[i].set_value(previous_vals[i])
             self.change_val()
@@ -452,7 +452,7 @@ class SudokuGrid(tk.Frame):
             self.hint_request.config(
                 text=f"Show hint ({self.master.settings['hint_num'].get() - self.hints_taken} left)")
             for i in range(len(self.master.game.puzzle.squares)):
-                if i != self.master.coord.get():
+                if i != self.coord.get():
                     self.master.game.puzzle.squares[i].set_value(previous_vals[i])
 
     def add_sandwich(self):
