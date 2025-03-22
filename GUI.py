@@ -14,8 +14,10 @@ class GameApp(tk.Tk):
             Represents the game being played
         self.settings: dict
             Stores all the settings
-        self.frame: LoadGameFrame|SudokuGrid|SettingsFrame
+        self.frame: LoadGameFrame|SudokuGrid
             The frame to be displayed
+        self.setting_frame: SettingsFrame
+            An instance of the SettingsFrame class
         """
         super().__init__()
         self.title("Sudoku")
@@ -166,7 +168,7 @@ class SudokuGrid(tk.Frame):
             Allows the time since the user began solving the puzzle to be calculated
         self.val: tk.StringVar
             The value a cell's value should be changed to
-        self.coord: IntVar
+        self.coord: tk.IntVar
             The cell the user is currently in
         """
         super().__init__()
